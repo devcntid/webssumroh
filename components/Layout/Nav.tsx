@@ -1,0 +1,101 @@
+"use client";
+
+import { useState, useEffect } from "react";
+import Link from "next/link";
+import { usePathname } from "next/navigation";
+import { ChevronDown, Menu, X } from "lucide-react";
+
+const LOGO = "https://ssumroh.id/wp-content/uploads/2023/01/Logo-Putih.png";
+
+export function Nav() {
+  const [scrolled, setScrolled] = useState(false);
+  const [mobileOpen, setMobileOpen] = useState(false);
+  const pathname = usePathname();
+
+  useEffect(() => {
+    const onScroll = () => setScrolled(window.scrollY > 50);
+    window.addEventListener("scroll", onScroll);
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
+
+  return (
+    <>
+      <nav className={`nav ${scrolled ? "scrolled" : ""}`}>
+        <div className="container nav-inner">
+          <Link href="/" className="nav-logo">
+            <img src={LOGO} alt="SS Umroh Logo" />
+          </Link>
+
+          <div className="nav-links hidden md:flex">
+            <div className="nav-item">
+              <Link href="/" className={`nav-link ${pathname === "/" ? "active" : ""}`}>Home</Link>
+            </div>
+            <div className="nav-item">
+              <Link href="/paket-umroh" className={`nav-link ${pathname.startsWith("/paket-umroh") ? "active" : ""}`}>Umroh <ChevronDown className="chevron" /></Link>
+              <div className="mega">
+                <Link href="/paket-umroh" className="mega-item">
+                  <div className="mega-icon">🕋</div>
+                  <div>
+                    <div className="mega-label">Umroh Hemat</div>
+                    <div className="mega-desc">Paket ekonomis fasilitas lengkap</div>
+                  </div>
+                </Link>
+                <Link href="/paket-umroh" className="mega-item">
+                  <div className="mega-icon">⭐</div>
+                  <div>
+                    <div className="mega-label">Umroh Bintang 4</div>
+                    <div className="mega-desc">Jarak hotel dekat dari Masjid</div>
+                  </div>
+                </Link>
+              </div>
+            </div>
+            <div className="nav-item">
+              <Link href="/halal-tour" className={`nav-link ${pathname.startsWith("/halal-tour") ? "active" : ""}`}>Halal Tour</Link>
+            </div>
+            <div className="nav-item">
+              <Link href="/korporat" className={`nav-link ${pathname.startsWith("/korporat") ? "active" : ""}`}>Korporat</Link>
+            </div>
+            <div className="nav-item">
+              <Link href="/destinasi" className={`nav-link ${pathname.startsWith("/destinasi") ? "active" : ""}`}>Destinasi</Link>
+            </div>
+            <div className="nav-item">
+              <Link href="/tentang-kami" className={`nav-link ${pathname.startsWith("/tentang-kami") ? "active" : ""}`}>Tentang Kami</Link>
+            </div>
+          </div>
+
+          <Link
+            href="/kontak"
+            className={`nav-cta hidden md:block ${pathname.startsWith("/kontak") ? "active" : ""}`}
+          >
+            Kontak
+          </Link>
+
+          <button 
+            className={`hamburger flex md:hidden ${mobileOpen ? "open" : ""}`}
+            onClick={() => setMobileOpen(!mobileOpen)}
+            aria-label="Toggle menu"
+          >
+            <span /><span /><span />
+          </button>
+        </div>
+      </nav>
+
+      {/* Mobile Nav Overlay */}
+      <div className={`mobile-nav ${mobileOpen ? "open" : ""}`}>
+        <Link href="/" onClick={() => setMobileOpen(false)}>Home</Link>
+        <Link href="/paket-umroh" onClick={() => setMobileOpen(false)}>Umroh</Link>
+        <Link href="/halal-tour" onClick={() => setMobileOpen(false)}>Halal Tour</Link>
+        <Link href="/korporat" onClick={() => setMobileOpen(false)}>Korporat</Link>
+        <Link href="/destinasi" onClick={() => setMobileOpen(false)}>Destinasi</Link>
+        <Link href="/tentang-kami" onClick={() => setMobileOpen(false)}>Tentang Kami</Link>
+        <Link
+          href="/kontak"
+          className={pathname.startsWith("/kontak") ? "active" : ""}
+          onClick={() => setMobileOpen(false)}
+        >
+          Kontak
+        </Link>
+      </div>
+    </>
+  );
+}
