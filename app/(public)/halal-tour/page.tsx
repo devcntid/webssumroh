@@ -8,6 +8,11 @@ import { TestimonialCard } from "@/components/Home/TestimonialCard";
 import { HalalExperienceTabs } from "@/components/public/sections/HalalExperienceTabs";
 import { getSiteSettings } from "@/lib/queries/site-settings";
 import { getPublicTestimonials } from "@/lib/queries/testimonials";
+import {
+  heroBackgroundStyle,
+  heroSectionStyle,
+  resolveHeroAppearance,
+} from "@/lib/hero-settings";
 import type { Testimonial } from "@/types/db";
 
 export const metadata: Metadata = {
@@ -122,6 +127,7 @@ export default async function HalalTourPage() {
   }
 
   const whatsappNumber = settings?.whatsapp_number || "6281312017883";
+  const hero = resolveHeroAppearance(settings, "halal-tour", HERO_IMAGE);
   const waUrl = (message?: string) =>
     `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(
       message ?? "Assalamu'alaikum SS Umroh, saya ingin konsultasi Halal Tour."
@@ -132,8 +138,12 @@ export default async function HalalTourPage() {
       <ScrollReveal />
 
       {/* ── HERO ── */}
-      <section className="page-hero halal-tour-hero" aria-label="Halal tour SS Umroh">
-        <div className="ph-bg" style={{ backgroundImage: `url(${HERO_IMAGE})` }} />
+      <section
+        className="page-hero halal-tour-hero"
+        aria-label="Halal tour SS Umroh"
+        style={heroSectionStyle(hero)}
+      >
+        <div className="ph-bg" style={heroBackgroundStyle(hero)} />
         <div className="ph-pattern" />
         <div className="ph-glow" />
         <div className="container">

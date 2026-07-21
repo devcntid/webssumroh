@@ -8,6 +8,13 @@
       "when": 1784543771472,
       "tag": "0000_marvelous_bishop",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1784628479812,
+      "tag": "0001_add_hero_settings",
+      "breakpoints": true
     }
   ]
 }

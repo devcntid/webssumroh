@@ -15,6 +15,11 @@ import {
   OfficeOpenStatus,
 } from "@/components/public/sections/ContactForm";
 import { getSiteSettings } from "@/lib/queries/site-settings";
+import {
+  heroBackgroundStyle,
+  heroSectionStyle,
+  resolveHeroAppearance,
+} from "@/lib/hero-settings";
 
 export const metadata: Metadata = {
   title: "Kontak & Lokasi | SS Umroh",
@@ -85,6 +90,7 @@ export default async function ContactPage() {
 
   const phoneDisplay = settings?.phone_display || "0813-1201-7883";
   const whatsappNumber = settings?.whatsapp_number || "6281312017883";
+  const hero = resolveHeroAppearance(settings, "kontak", HERO_IMAGE);
   const officeAddress =
     settings?.office_address || "Jl. Cihapit No. 41, Kota Bandung";
   const csName = settings?.cs_name || "Bayu Muharram";
@@ -133,11 +139,12 @@ export default async function ContactPage() {
     <>
       <ScrollReveal />
 
-      <section className="page-hero contact-page-hero" aria-label="Kontak SS Umroh">
-        <div
-          className="ph-bg"
-          style={{ backgroundImage: `url(${HERO_IMAGE})` }}
-        />
+      <section
+        className="page-hero contact-page-hero"
+        aria-label="Kontak SS Umroh"
+        style={heroSectionStyle(hero)}
+      >
+        <div className="ph-bg" style={heroBackgroundStyle(hero)} />
         <div className="ph-pattern" />
         <div className="ph-glow" />
         <div className="container">

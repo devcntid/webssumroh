@@ -7,6 +7,11 @@ import { TestimonialCard } from "@/components/Home/TestimonialCard";
 import { DestinationExplorer } from "@/components/public/sections/DestinationExplorer";
 import { getSiteSettings } from "@/lib/queries/site-settings";
 import { getPublicTestimonials } from "@/lib/queries/testimonials";
+import {
+  heroBackgroundStyle,
+  heroSectionStyle,
+  resolveHeroAppearance,
+} from "@/lib/hero-settings";
 
 export const metadata: Metadata = {
   title: "Destinasi Umroh | SS Umroh",
@@ -64,6 +69,7 @@ export default async function DestinationsPage() {
   }
 
   const whatsappNumber = settings?.whatsapp_number || "6281312017883";
+  const hero = resolveHeroAppearance(settings, "destinasi", HERO_IMAGE);
   const waUrl = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(
     "Assalamu'alaikum SS Umroh, saya ingin konsultasi paket dan destinasi umroh."
   )}`;
@@ -72,8 +78,12 @@ export default async function DestinationsPage() {
     <>
       <ScrollReveal />
 
-      <section className="page-hero destination-page-hero" aria-label="Destinasi umroh">
-        <div className="ph-bg" style={{ backgroundImage: `url(${HERO_IMAGE})` }} />
+      <section
+        className="page-hero destination-page-hero"
+        aria-label="Destinasi umroh"
+        style={heroSectionStyle(hero)}
+      >
+        <div className="ph-bg" style={heroBackgroundStyle(hero)} />
         <div className="ph-pattern" />
         <div className="ph-glow" />
         <div className="ph-glow-secondary" />

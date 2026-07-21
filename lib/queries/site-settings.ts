@@ -1,6 +1,6 @@
 import { sql } from "@/lib/db";
 import { CACHE_KEYS, getCachedOrFetch } from "@/lib/cache";
-import type { SiteSetting } from "@/types/db";
+import type { HeroSettings, SiteSetting } from "@/types/db";
 
 const SITE_SETTINGS_TTL = 1800;
 
@@ -11,6 +11,7 @@ export interface SiteSettingsInput {
   cs_name: string;
   ppiu_license: string;
   maps_embed_url?: string | null;
+  hero_settings: HeroSettings;
 }
 
 /**
@@ -24,7 +25,7 @@ export async function getSiteSettings(): Promise<SiteSetting | null> {
       const rows = await sql`
         SELECT
           id, phone_display, whatsapp_number, office_address, cs_name,
-          ppiu_license, maps_embed_url, updated_at, updated_by
+          ppiu_license, maps_embed_url, hero_settings, updated_at, updated_by
         FROM site_settings
         ORDER BY id ASC
         LIMIT 1
@@ -54,12 +55,13 @@ export async function updateSiteSettings(
       cs_name = ${input.cs_name},
       ppiu_license = ${input.ppiu_license},
       maps_embed_url = ${input.maps_embed_url ?? null},
+      hero_settings = ${JSON.stringify(input.hero_settings)}::jsonb,
       updated_by = ${userId},
       updated_at = NOW()
     WHERE id = ${existing.id}
     RETURNING
       id, phone_display, whatsapp_number, office_address, cs_name,
-      ppiu_license, maps_embed_url, updated_at, updated_by
+      ppiu_license, maps_embed_url, hero_settings, updated_at, updated_by
   `;
   return (rows[0] as SiteSetting) ?? null;
 }

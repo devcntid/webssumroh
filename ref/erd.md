@@ -65,6 +65,8 @@ CREATE TABLE site_settings (
     cs_name             VARCHAR(100) NOT NULL DEFAULT 'Bayu Muharram',
     ppiu_license        VARCHAR(100) NOT NULL DEFAULT 'SK PPIU No. U.108 Tahun 2021',
     maps_embed_url      TEXT,
+    -- Per-page public hero image URL and background color, keyed by route name
+    hero_settings       JSONB        NOT NULL DEFAULT '{}'::jsonb,
     updated_at          TIMESTAMPTZ  NOT NULL DEFAULT NOW(),
     updated_by          BIGINT       -- FK to admin_users.id (nullable for seed)
 );

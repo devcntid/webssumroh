@@ -12,6 +12,11 @@ import {
 import { ScrollReveal } from "@/components/Home/ScrollReveal";
 import { getSiteSettings } from "@/lib/queries/site-settings";
 import { getActiveTeamMembers } from "@/lib/queries/team-members";
+import {
+  heroBackgroundStyle,
+  heroSectionStyle,
+  resolveHeroAppearance,
+} from "@/lib/hero-settings";
 import type { Department, TeamMember } from "@/types/db";
 
 export const metadata: Metadata = {
@@ -193,6 +198,7 @@ export default async function TeamPage() {
       : FALLBACK_MANAGEMENT.map(toCard);
 
   const whatsappNumber = settings?.whatsapp_number || "6281312017883";
+  const hero = resolveHeroAppearance(settings, "tim", HERO_IMAGE);
   const license = settings?.ppiu_license || "SK PPIU No.U.108/2021";
   const waUrl = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(
     "Assalamu'alaikum SS Umroh, saya ingin mengenal lebih lanjut tim manajemen dan pembimbing umroh."
@@ -202,8 +208,12 @@ export default async function TeamPage() {
     <>
       <ScrollReveal />
 
-      <section className="page-hero team-page-hero" aria-label="Tim SS Umroh">
-        <div className="ph-bg" style={{ backgroundImage: `url(${HERO_IMAGE})` }} />
+      <section
+        className="page-hero team-page-hero"
+        aria-label="Tim SS Umroh"
+        style={heroSectionStyle(hero)}
+      >
+        <div className="ph-bg" style={heroBackgroundStyle(hero)} />
         <div className="ph-pattern" />
         <div className="ph-glow" />
         <div className="container">

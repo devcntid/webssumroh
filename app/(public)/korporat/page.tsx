@@ -13,6 +13,11 @@ import { ScrollReveal } from "@/components/Home/ScrollReveal";
 import { TestimonialCard } from "@/components/Home/TestimonialCard";
 import { getSiteSettings } from "@/lib/queries/site-settings";
 import { getPublicTestimonials } from "@/lib/queries/testimonials";
+import {
+  heroBackgroundStyle,
+  heroSectionStyle,
+  resolveHeroAppearance,
+} from "@/lib/hero-settings";
 
 export const metadata: Metadata = {
   title: "Umroh Korporat & Group | SS Umroh",
@@ -112,6 +117,7 @@ export default async function CorporatePage() {
   }
 
   const whatsappNumber = settings?.whatsapp_number || "6281312017883";
+  const hero = resolveHeroAppearance(settings, "korporat", HERO_IMAGE);
   const waUrl = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(
     "Assalamu'alaikum SS Umroh, saya ingin konsultasi program umroh korporat dan mendapatkan penawaran group."
   )}`;
@@ -123,8 +129,12 @@ export default async function CorporatePage() {
     <>
       <ScrollReveal />
 
-      <section className="page-hero corporate-page-hero" aria-label="Umroh korporat">
-        <div className="ph-bg" style={{ backgroundImage: `url(${HERO_IMAGE})` }} />
+      <section
+        className="page-hero corporate-page-hero"
+        aria-label="Umroh korporat"
+        style={heroSectionStyle(hero)}
+      >
+        <div className="ph-bg" style={heroBackgroundStyle(hero)} />
         <div className="ph-pattern" />
         <div className="ph-glow" />
         <div className="container">

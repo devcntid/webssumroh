@@ -12,6 +12,25 @@ export type TravelType = "umroh" | "halal-tour" | "both";
 export type AuditAction = "created" | "updated" | "deleted" | "login" | "logout";
 export type Department = "Operations" | "Marketing" | "Customer Service" | "Finance" | "Management";
 
+export type HeroPageKey =
+  | "home"
+  | "paket-umroh"
+  | "halal-tour"
+  | "korporat"
+  | "destinasi"
+  | "tentang-kami"
+  | "kontak"
+  | "tim"
+  | "privacy"
+  | "terms";
+
+export interface HeroAppearance {
+  image_url: string | null;
+  background_color: string;
+}
+
+export type HeroSettings = Partial<Record<HeroPageKey, HeroAppearance>>;
+
 export interface SiteSetting {
   id: number;
   phone_display: string;
@@ -20,6 +39,7 @@ export interface SiteSetting {
   cs_name: string;
   ppiu_license: string;
   maps_embed_url: string | null;
+  hero_settings: HeroSettings;
   updated_at: string;
   updated_by: number | null;
 }

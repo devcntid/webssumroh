@@ -12,6 +12,11 @@ import { ScrollReveal } from "@/components/Home/ScrollReveal";
 import { TestimonialCard } from "@/components/Home/TestimonialCard";
 import { getSiteSettings } from "@/lib/queries/site-settings";
 import { getPublicTestimonials } from "@/lib/queries/testimonials";
+import {
+  heroBackgroundStyle,
+  heroSectionStyle,
+  resolveHeroAppearance,
+} from "@/lib/hero-settings";
 
 export const metadata: Metadata = {
   title: "Tentang Kami | SS Umroh",
@@ -111,6 +116,7 @@ export default async function AboutPage() {
   }
 
   const whatsappNumber = settings?.whatsapp_number || "6281312017883";
+  const hero = resolveHeroAppearance(settings, "tentang-kami", HERO_IMAGE);
   const license = settings?.ppiu_license || "SK PPIU No. U.108 Tahun 2021";
   const office = settings?.office_address || "Jl. Cihapit No. 41, Kota Bandung";
   const waUrl = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(
@@ -131,8 +137,12 @@ export default async function AboutPage() {
     <>
       <ScrollReveal />
 
-      <section className="page-hero about-page-hero" aria-label="Tentang SS Umroh">
-        <div className="ph-bg" style={{ backgroundImage: `url(${HERO_IMAGE})` }} />
+      <section
+        className="page-hero about-page-hero"
+        aria-label="Tentang SS Umroh"
+        style={heroSectionStyle(hero)}
+      >
+        <div className="ph-bg" style={heroBackgroundStyle(hero)} />
         <div className="ph-pattern" />
         <div className="ph-glow" />
         <div className="container">

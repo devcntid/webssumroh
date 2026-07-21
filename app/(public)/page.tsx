@@ -4,6 +4,11 @@ import { getFeaturedPackages } from "@/lib/queries/packages";
 import { getPublicTestimonials } from "@/lib/queries/testimonials";
 import { getPublicFaqs } from "@/lib/queries/faqs";
 import { getSiteSettings } from "@/lib/queries/site-settings";
+import {
+  heroBackgroundStyle,
+  heroSectionStyle,
+  resolveHeroAppearance,
+} from "@/lib/hero-settings";
 import { PackageCard } from "@/components/Home/PackageCard";
 import { TestimonialCard } from "@/components/Home/TestimonialCard";
 import { FAQList } from "@/components/Home/FAQList";
@@ -98,6 +103,7 @@ export default async function HomePage() {
 
   const phone = settings?.phone_display || "0813-1201-7883";
   const license = settings?.ppiu_license || "SK PPIU No.U.108/2021";
+  const hero = resolveHeroAppearance(settings, "home", HERO_BG);
   const waUrl = `https://wa.me/${settings?.whatsapp_number || "6281312017883"}?text=Assalamu%27alaikum%20SS%20Umroh%2C%20saya%20ingin%20konsultasi%20paket%20umroh.`;
 
   return (
@@ -105,8 +111,8 @@ export default async function HomePage() {
       <ScrollReveal />
 
       {/* 1. Hero — fullscreen */}
-      <section className="home-hero" aria-label="Hero SS Umroh">
-        <div className="ph-bg" style={{ backgroundImage: `url(${HERO_BG})` }} />
+      <section className="home-hero" aria-label="Hero SS Umroh" style={heroSectionStyle(hero)}>
+        <div className="ph-bg" style={heroBackgroundStyle(hero)} />
         <div className="ph-pattern" />
         <div className="ph-glow" />
         <div className="ph-glow-secondary" />

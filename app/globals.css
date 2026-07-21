@@ -270,7 +270,7 @@ footer{background:var(--p9);border-top:1px solid rgba(255,255,255,.05);padding:c
 .home-hero-inner{position:relative;z-index:2;width:100%;padding-block:clamp(56px,10vw,108px)}
 .home-hero-copy{max-width:80%}
 .ph-bg{position:absolute;inset:0;background-size:cover;background-position:center 30%}
-.ph-bg::after{content:'';position:absolute;inset:0;background:linear-gradient(155deg,rgba(10,1,26,.96) 0%,rgba(26,5,51,.90) 35%,rgba(45,10,92,.84) 60%,rgba(10,1,26,.93) 100%)}
+.ph-bg::after{content:'';position:absolute;inset:0;background:linear-gradient(155deg,color-mix(in srgb,var(--hero-color,#1a0533) 96%,transparent) 0%,color-mix(in srgb,var(--hero-color,#1a0533) 90%,transparent) 35%,color-mix(in srgb,var(--hero-color,#1a0533) 82%,transparent) 60%,color-mix(in srgb,var(--hero-color,#1a0533) 94%,transparent) 100%)}
 .ph-pattern{position:absolute;inset:0;opacity:.045;background-image:repeating-linear-gradient(30deg,transparent,transparent 34px,rgba(212,160,23,1) 34px,rgba(212,160,23,1) 35px),repeating-linear-gradient(150deg,transparent,transparent 34px,rgba(212,160,23,1) 34px,rgba(212,160,23,1) 35px);pointer-events:none}
 .ph-glow{position:absolute;top:-8%;right:-4%;width:min(560px,62vw);height:min(560px,62vw);background:radial-gradient(ellipse,rgba(124,58,190,.30) 0%,transparent 68%);pointer-events:none}
 .ph-glow-secondary{position:absolute;bottom:-10%;left:-5%;width:min(440px,48vw);height:min(440px,48vw);background:radial-gradient(ellipse,rgba(196,35,92,.15) 0%,transparent 68%);pointer-events:none}
@@ -667,7 +667,7 @@ footer{background:var(--p9);border-top:1px solid rgba(255,255,255,.05);padding:c
 .contact-whatsapp-row{display:flex;align-items:center;gap:12px;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.18);border-radius:12px;padding:14px 18px;color:#fff;font-size:14px;font-weight:600;text-decoration:none}
 
 /* Legal pages */
-.legal-hero-bg{background-image:radial-gradient(circle at 78% 28%,rgba(212,160,23,.2),transparent 28%),radial-gradient(circle at 20% 75%,rgba(124,58,190,.32),transparent 35%),linear-gradient(135deg,var(--p9),#34106c)}
+.legal-hero-bg{background-image:radial-gradient(circle at 78% 28%,rgba(212,160,23,.2),transparent 28%),radial-gradient(circle at 20% 75%,rgba(124,58,190,.22),transparent 35%),linear-gradient(135deg,var(--hero-color,#1a0533),color-mix(in srgb,var(--hero-color,#1a0533) 74%,#fff))}
 .legal-hero-content{max-width:820px}
 .legal-hero-icon{width:60px;height:60px;border-radius:18px;background:rgba(212,160,23,.12);border:1px solid rgba(212,160,23,.28);color:var(--g6);display:flex;align-items:center;justify-content:center;margin-bottom:20px}
 .legal-content-section{background:var(--n0)}

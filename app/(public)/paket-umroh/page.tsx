@@ -17,6 +17,11 @@ import { getPublicFaqs } from "@/lib/queries/faqs";
 import { getActivePackages } from "@/lib/queries/packages";
 import { getSiteSettings } from "@/lib/queries/site-settings";
 import { getPublicTestimonials } from "@/lib/queries/testimonials";
+import {
+  heroBackgroundStyle,
+  heroSectionStyle,
+  resolveHeroAppearance,
+} from "@/lib/hero-settings";
 
 export const metadata: Metadata = {
   title: "Paket Umroh | SS Umroh",
@@ -81,6 +86,7 @@ export default async function PackageUmrohPage() {
 
   const whatsappNumber = settings?.whatsapp_number || "6281312017883";
   const license = settings?.ppiu_license || "SK PPIU No. U.108 Tahun 2021";
+  const hero = resolveHeroAppearance(settings, "paket-umroh", HERO_IMAGE);
   const waUrl = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(
     "Assalamu'alaikum SS Umroh, saya ingin konsultasi paket umroh."
   )}`;
@@ -89,8 +95,12 @@ export default async function PackageUmrohPage() {
     <>
       <ScrollReveal />
 
-      <section className="page-hero package-page-hero" aria-label="Paket Umroh SS Umroh">
-        <div className="ph-bg" style={{ backgroundImage: `url(${HERO_IMAGE})` }} />
+      <section
+        className="page-hero package-page-hero"
+        aria-label="Paket Umroh SS Umroh"
+        style={heroSectionStyle(hero)}
+      >
+        <div className="ph-bg" style={heroBackgroundStyle(hero)} />
         <div className="ph-pattern" />
         <div className="ph-glow" />
         <div className="container">

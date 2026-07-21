@@ -24,6 +24,10 @@ export const siteSettings = pgTable("site_settings", {
   cs_name: varchar("cs_name", { length: 100 }).notNull().default("Bayu Muharram"),
   ppiu_license: varchar("ppiu_license", { length: 100 }).notNull().default("SK PPIU No. U.108 Tahun 2021"),
   maps_embed_url: text("maps_embed_url"),
+  hero_settings: jsonb("hero_settings")
+    .$type<Record<string, { image_url: string | null; background_color: string }>>()
+    .notNull()
+    .default({}),
   updated_at: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
   updated_by: bigint("updated_by", { mode: "number" }), // FK to admin_users.id handled loosely or explicitly
 });

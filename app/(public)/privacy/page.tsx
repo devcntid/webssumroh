@@ -4,6 +4,8 @@ import {
   LegalPage,
   type LegalSection,
 } from "@/components/public/sections/LegalPage";
+import { getSiteSettings } from "@/lib/queries/site-settings";
+import { resolveHeroAppearance } from "@/lib/hero-settings";
 
 export const metadata: Metadata = {
   title: "Kebijakan Privasi | SS Umroh",
@@ -227,7 +229,15 @@ const SECTIONS: LegalSection[] = [
   },
 ];
 
-export default function PrivacyPage() {
+export default async function PrivacyPage() {
+  let settings: Awaited<ReturnType<typeof getSiteSettings>> = null;
+  try {
+    settings = await getSiteSettings();
+  } catch {
+    // Keep legal content available when external services are unavailable.
+  }
+  const hero = resolveHeroAppearance(settings, "privacy", null);
+
   return (
     <LegalPage
       eyebrow="Kebijakan Privasi"
@@ -235,6 +245,7 @@ export default function PrivacyPage() {
       description="Transparansi tentang cara SS Umroh mengumpulkan, menggunakan, menyimpan, dan melindungi data pribadi Anda."
       effectiveDate={EFFECTIVE_DATE}
       sections={SECTIONS}
+      hero={hero}
     />
   );
 }

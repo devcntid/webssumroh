@@ -7,6 +7,8 @@ import type { ReactNode } from "react";
 import Link from "next/link";
 import { FileText, MessageCircle } from "lucide-react";
 import { ScrollReveal } from "@/components/Home/ScrollReveal";
+import { heroBackgroundStyle, heroSectionStyle } from "@/lib/hero-settings";
+import type { HeroAppearance } from "@/types/db";
 
 export interface LegalSection {
   id: string;
@@ -20,6 +22,7 @@ interface LegalPageProps {
   description: string;
   effectiveDate: string;
   sections: LegalSection[];
+  hero: HeroAppearance;
 }
 
 export function LegalPage({
@@ -28,13 +31,18 @@ export function LegalPage({
   description,
   effectiveDate,
   sections,
+  hero,
 }: LegalPageProps) {
   return (
     <>
       <ScrollReveal />
 
-      <section className="page-hero legal-page-hero" aria-label={title}>
-        <div className="ph-bg legal-hero-bg" />
+      <section
+        className="page-hero legal-page-hero"
+        aria-label={title}
+        style={heroSectionStyle(hero)}
+      >
+        <div className="ph-bg legal-hero-bg" style={heroBackgroundStyle(hero)} />
         <div className="ph-pattern" />
         <div className="ph-glow" />
         <div className="container">

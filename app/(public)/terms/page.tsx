@@ -4,6 +4,8 @@ import {
   LegalPage,
   type LegalSection,
 } from "@/components/public/sections/LegalPage";
+import { getSiteSettings } from "@/lib/queries/site-settings";
+import { resolveHeroAppearance } from "@/lib/hero-settings";
 
 export const metadata: Metadata = {
   title: "Syarat dan Ketentuan Layanan | SS Umroh",
@@ -257,7 +259,15 @@ const SECTIONS: LegalSection[] = [
   },
 ];
 
-export default function TermsPage() {
+export default async function TermsPage() {
+  let settings: Awaited<ReturnType<typeof getSiteSettings>> = null;
+  try {
+    settings = await getSiteSettings();
+  } catch {
+    // Keep legal content available when external services are unavailable.
+  }
+  const hero = resolveHeroAppearance(settings, "terms", null);
+
   return (
     <LegalPage
       eyebrow="Syarat & Ketentuan"
@@ -265,6 +275,7 @@ export default function TermsPage() {
       description="Ketentuan yang membantu memastikan penggunaan situs dan layanan perjalanan SS Umroh berlangsung jelas, aman, dan transparan."
       effectiveDate={EFFECTIVE_DATE}
       sections={SECTIONS}
+      hero={hero}
     />
   );
 }
