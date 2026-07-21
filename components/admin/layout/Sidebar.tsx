@@ -2,10 +2,11 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { signOut } from "next-auth/react";
 import {
   LayoutDashboard, Settings, Package, Calendar, Globe, Map, Star,
   HelpCircle, Image, Users, Mail, Building2, UserCog, ClipboardList,
-  ChevronRight,
+  ChevronRight, LogOut,
 } from "lucide-react";
 import { Badge } from "@/components/admin/ui/Badge";
 import { navForRole } from "@/lib/admin-nav";
@@ -86,6 +87,24 @@ export function Sidebar({ role, fullName, newLeadsCount = 0 }: SidebarProps) {
           </div>
           <Badge color="pink">{role}</Badge>
         </div>
+        <button
+          type="button"
+          className="admin-nav-item"
+          onClick={() => signOut({ callbackUrl: "/panel/login" })}
+          title="Keluar"
+          aria-label="Keluar"
+          style={{
+            width: "auto",
+            margin: 0,
+            padding: 8,
+            background: "transparent",
+            border: "none",
+            cursor: "pointer",
+            color: "rgba(255,255,255,.7)",
+          }}
+        >
+          <LogOut size={14} />
+        </button>
       </div>
     </aside>
   );
