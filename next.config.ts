@@ -12,7 +12,7 @@ const nextConfig: NextConfig = {
       { protocol: "https", hostname: "hamisbooking.com" },
     ],
   },
-  serverExternalPackages: ["@neondatabase/serverless", "isomorphic-dompurify"],
+  serverExternalPackages: ["@neondatabase/serverless", "sanitize-html"],
 };
 
 export default nextConfig;
