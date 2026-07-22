@@ -45,7 +45,7 @@ const SITES: Record<Exclude<TabId, "hotel">, Site[]> = {
       arabic: "الرَّوْضَةُ الشَّرِيفَةُ",
       badge: "⭐ Taman Surga",
       description: "Antara mimbar dan makam Rasulullah SAW — taman surga di Masjid Nabawi. Tempat istimewa untuk berdoa dengan khusyuk.",
-      image: "https://images.unsplash.com/photo-1580418827493-f2b22c0a76cb?auto=format&fit=crop&w=800&h=500&q=80",
+      image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRfdqk8o4u1wFLn7Mt46j20pQz2UKoCDGRNxuy3Ks0yXA&s=10",
       imageAlt: "Interior masjid dengan arsitektur Islam di Madinah",
     },
     {
@@ -53,7 +53,7 @@ const SITES: Record<Exclude<TabId, "hotel">, Site[]> = {
       arabic: "الْبَقِيعُ",
       badge: "📍 Ziarah",
       description: "Pemakaman bersejarah di sisi timur Masjid Nabawi. Tempat peristirahatan para sahabat, istri, dan keluarga Rasulullah SAW.",
-      image: "https://images.unsplash.com/photo-1604580864964-0462f5d5b1a8?auto=format&fit=crop&w=800&h=500&q=80",
+      image: "https://upload.wikimedia.org/wikipedia/commons/e/eb/Al-Baqi_Cemetery_2021.jpg",
       imageAlt: "Lanskap bersejarah kawasan Madinah",
     },
     {
@@ -69,7 +69,7 @@ const SITES: Record<Exclude<TabId, "hotel">, Site[]> = {
       arabic: "مَسْجِدُ الْقِبْلَتَيْن",
       badge: "⚬ Dua Kiblat",
       description: "Tempat turunnya perintah mengubah kiblat dari Masjidil Aqsa ke Ka'bah saat Rasulullah SAW sedang sholat.",
-      image: "https://images.unsplash.com/photo-1564121211835-e88c852648ab?auto=format&fit=crop&w=800&h=500&q=80",
+      image: "https://images.unsplash.com/photo-1512970648279-ff3398568f77?q=80",
       imageAlt: "Masjid dengan kubah dan menara di Arab Saudi",
     },
     {
@@ -191,7 +191,7 @@ const HOTELS = [
     city: "Mekkah Al-Mukarramah",
     stars: 5,
     distance: "350m dari Masjidil Haram",
-    image: "https://images.unsplash.com/photo-1591604129939-f1efa4d9f7fa?auto=format&fit=crop&w=900&h=520&q=80",
+    image: "https://hamisbooking.com/wp-content/uploads/Screenshot-2024-02-04-141208.jpg",
     imageAlt: "Masjidil Haram dekat akomodasi jamaah",
     features: ["Tawaf sunnah kapan saja tanpa shuttle", "Hotel bintang 5 dekat Masjidil Haram", "Restoran halal internasional", "Tersedia di paket Bintang 4"],
   },

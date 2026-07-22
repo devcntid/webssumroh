@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { ChevronDown, Menu, X } from "lucide-react";
+import { ChevronDown } from "lucide-react";
 
 const LOGO = "https://ssumroh.id/wp-content/uploads/2023/01/Logo-Putih.png";
 
@@ -26,7 +26,7 @@ export function Nav() {
             <img src={LOGO} alt="SS Umroh Logo" />
           </Link>
 
-          <div className="nav-links hidden md:flex">
+          <div className="nav-links">
             <div className="nav-item">
               <Link href="/" className={`nav-link ${pathname === "/" ? "active" : ""}`}>Home</Link>
             </div>
@@ -65,15 +65,16 @@ export function Nav() {
 
           <Link
             href="/kontak"
-            className={`nav-cta hidden md:block ${pathname.startsWith("/kontak") ? "active" : ""}`}
+            className={`nav-cta ${pathname.startsWith("/kontak") ? "active" : ""}`}
           >
             Kontak
           </Link>
 
-          <button 
-            className={`hamburger flex md:hidden ${mobileOpen ? "open" : ""}`}
+          <button
+            className={`hamburger ${mobileOpen ? "open" : ""}`}
             onClick={() => setMobileOpen(!mobileOpen)}
             aria-label="Toggle menu"
+            aria-expanded={mobileOpen}
           >
             <span /><span /><span />
           </button>

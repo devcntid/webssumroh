@@ -28,7 +28,7 @@ export const metadata: Metadata = {
 const HERO_IMAGE =
   "https://images.unsplash.com/photo-1522071820081-009f0129c71c?auto=format&fit=crop&w=1920&q=85";
 const SERVICE_IMAGE =
-  "https://images.unsplash.com/photo-1542744173-8e7e53415bb0?auto=format&fit=crop&w=1400&q=80";
+  "https://images.unsplash.com/photo-1551135049-8a33b5883817?q=80";
 
 const SERVICES = [
   {

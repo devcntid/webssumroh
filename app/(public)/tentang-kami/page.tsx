@@ -27,7 +27,7 @@ export const metadata: Metadata = {
 const HERO_IMAGE =
   "https://images.unsplash.com/photo-1476514525535-07fb3b4ae5f1?auto=format&fit=crop&w=1920&q=85";
 const STORY_IMAGE =
-  "https://images.unsplash.com/photo-1573164713988-8665fc963095?auto=format&fit=crop&w=1000&q=80";
+  "https://images.unsplash.com/photo-1504150558240-0b4fd8946624";
 const LEADERSHIP_IMAGE =
   "https://cna.co.id/wp-content/uploads/2019/01/Hamzah-Romzul-500px-x-600px-2.jpg";
 

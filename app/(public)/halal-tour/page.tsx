@@ -241,9 +241,9 @@ export default async function HalalTourPage() {
               Setiap detail perjalanan kami rancang mempertimbangkan kebutuhan unik wisatawan Muslim.
             </p>
           </div>
-          <div className="why-grid-10">
+          <div className="why-grid-10" role="list" aria-label="Daftar keunggulan, geser ke samping">
             {ADVANTAGES.map(([icon, title, description, badge]) => (
-              <article className="k-card" key={title}>
+              <article className="k-card" key={title} role="listitem">
                 <div className="k-icon" aria-hidden>{icon}</div>
                 <h3 className="k-title">{title}</h3>
                 <p className="k-body">{description}</p>
