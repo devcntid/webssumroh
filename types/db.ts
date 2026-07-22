@@ -24,9 +24,15 @@ export type HeroPageKey =
   | "privacy"
   | "terms";
 
+export type HeroMediaType = "image" | "youtube" | "video";
+
 export interface HeroAppearance {
   image_url: string | null;
   background_color: string;
+  /** Home hero media mode. Other pages currently use image. */
+  media_type?: HeroMediaType;
+  /** YouTube URL/ID or direct .mp4/.webm file URL. */
+  video_url?: string | null;
 }
 
 export type HeroSettings = Partial<Record<HeroPageKey, HeroAppearance>>;

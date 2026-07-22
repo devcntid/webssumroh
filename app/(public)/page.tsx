@@ -9,6 +9,7 @@ import {
   heroSectionStyle,
   resolveHeroAppearance,
 } from "@/lib/hero-settings";
+import { HeroMediaBackground } from "@/components/public/sections/HeroMediaBackground";
 import { PackageCard } from "@/components/Home/PackageCard";
 import { TestimonialCard } from "@/components/Home/TestimonialCard";
 import { FAQList } from "@/components/Home/FAQList";
@@ -112,7 +113,9 @@ export default async function HomePage() {
 
       {/* 1. Hero — fullscreen */}
       <section className="home-hero" aria-label="Hero SS Umroh" style={heroSectionStyle(hero)}>
-        <div className="ph-bg" style={heroBackgroundStyle(hero)} />
+        <div className="ph-bg" style={heroBackgroundStyle(hero)}>
+          <HeroMediaBackground hero={hero} posterAlt="Latar hero SS Umroh" />
+        </div>
         <div className="ph-pattern" />
         <div className="ph-glow" />
         <div className="ph-glow-secondary" />

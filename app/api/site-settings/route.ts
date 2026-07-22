@@ -5,13 +5,58 @@ import { requireAuth } from "@/lib/auth";
 import { invalidate, CACHE_KEYS } from "@/lib/cache";
 import { writeAuditLog } from "@/lib/queries/audit-logs";
 import { getSiteSettings, updateSiteSettings } from "@/lib/queries/site-settings";
+import { extractYoutubeId } from "@/lib/hero-settings";
 
 const SETTINGS_ROLES = ["super_admin", "admin"] as const;
 
-const HeroAppearanceSchema = z.object({
-  image_url: z.string().url().nullable(),
-  background_color: z.string().regex(/^#[0-9A-Fa-f]{6}$/, "Use a 6-digit hex color"),
-});
+const HeroAppearanceSchema = z
+  .object({
+    image_url: z.string().url().nullable(),
+    background_color: z
+      .string()
+      .regex(/^#[0-9A-Fa-f]{6}$/, "Use a 6-digit hex color"),
+    media_type: z.enum(["image", "youtube", "video"]).optional().default("image"),
+    video_url: z.string().nullable().optional(),
+  })
+  .superRefine((value, ctx) => {
+    const videoUrl = value.video_url?.trim() || null;
+
+    if (value.media_type === "youtube") {
+      if (!videoUrl || !extractYoutubeId(videoUrl)) {
+        ctx.addIssue({
+          code: "custom",
+          path: ["video_url"],
+          message: "Enter a valid YouTube URL or 11-character video ID",
+        });
+      }
+      return;
+    }
+
+    if (value.media_type === "video") {
+      if (!videoUrl) {
+        ctx.addIssue({
+          code: "custom",
+          path: ["video_url"],
+          message: "Upload a video or paste a direct video file URL",
+        });
+        return;
+      }
+      try {
+        // eslint-disable-next-line no-new
+        new URL(videoUrl);
+      } catch {
+        ctx.addIssue({
+          code: "custom",
+          path: ["video_url"],
+          message: "Video file URL must be a valid URL",
+        });
+      }
+    }
+  })
+  .transform((value) => ({
+    ...value,
+    video_url: value.video_url?.trim() || null,
+  }));
 
 const HeroSettingsSchema = z.object({
   home: HeroAppearanceSchema.optional(),

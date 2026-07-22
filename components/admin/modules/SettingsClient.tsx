@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
-import { Image as ImageIcon, RotateCcw, Save, Upload } from "lucide-react";
+import { Image as ImageIcon, RotateCcw, Save, Upload, Video } from "lucide-react";
 import { HexColorInput, HexColorPicker } from "react-colorful";
 import { Field } from "@/components/admin/ui/Field";
 import { Btn } from "@/components/admin/ui/Btn";
@@ -12,7 +12,7 @@ import {
   HERO_PAGES,
   normalizeHeroSettings,
 } from "@/lib/hero-settings";
-import type { HeroAppearance, HeroPageKey, SiteSetting } from "@/types/db";
+import type { HeroAppearance, HeroMediaType, HeroPageKey, SiteSetting } from "@/types/db";
 
 type Form = {
   phone_display: string;
@@ -34,6 +34,12 @@ const EMPTY: Form = {
   hero_settings: normalizeHeroSettings(),
 };
 
+const MEDIA_OPTIONS: { value: HeroMediaType; label: string }[] = [
+  { value: "image", label: "Image" },
+  { value: "youtube", label: "YouTube" },
+  { value: "video", label: "Video file" },
+];
+
 export function SettingsClient() {
   const { showToast } = useToast();
   const [form, setForm] = useState<Form>(EMPTY);
@@ -41,6 +47,7 @@ export function SettingsClient() {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [uploadingPage, setUploadingPage] = useState<HeroPageKey | null>(null);
+  const [uploadingVideoPage, setUploadingVideoPage] = useState<HeroPageKey | null>(null);
   const [activeColorPicker, setActiveColorPicker] = useState<HeroPageKey | null>(null);
 
   const load = useCallback(async () => {
@@ -119,6 +126,23 @@ export function SettingsClient() {
     showToast("Hero image uploaded. Save settings to publish it.");
   }
 
+  async function uploadHeroVideo(page: HeroPageKey, file?: File) {
+    if (!file) return;
+    setUploadingVideoPage(page);
+    const body = new FormData();
+    body.append("file", file);
+    body.append("folder", `heroes/${page}/videos`);
+    const response = await fetch("/api/upload", { method: "POST", body });
+    const json = await response.json().catch(() => ({}));
+    setUploadingVideoPage(null);
+    if (!response.ok || !json.data?.url) {
+      showToast(json.error || "Failed to upload hero video", "error");
+      return;
+    }
+    setHero(page, { media_type: "video", video_url: json.data.url });
+    showToast("Hero video uploaded. Save settings to publish it.");
+  }
+
   if (loading) return <div className="admin-empty">Loading settings…</div>;
 
   return (
@@ -160,6 +184,7 @@ export function SettingsClient() {
           <h3 style={{ margin: "0 0 5px", fontSize: 15 }}>Page hero appearance</h3>
           <p style={{ margin: 0, fontSize: 12, color: "var(--text-secondary)" }}>
             Upload a background image and choose the overlay color for each public page.
+            Home also supports a YouTube or uploaded video background.
           </p>
         </div>
 
@@ -173,6 +198,10 @@ export function SettingsClient() {
           {HERO_PAGES.map((page) => {
             const hero = form.hero_settings[page.key];
             const uploading = uploadingPage === page.key;
+            const uploadingVideo = uploadingVideoPage === page.key;
+            const mediaType = hero.media_type ?? "image";
+            const supportsVideo = Boolean(page.supportsVideo);
+
             return (
               <section
                 key={page.key}
@@ -200,7 +229,26 @@ export function SettingsClient() {
                     backgroundPosition: "center",
                   }}
                 >
-                  {!hero.image_url && <ImageIcon size={30} opacity={0.7} aria-hidden />}
+                  {!hero.image_url && mediaType === "image" && (
+                    <ImageIcon size={30} opacity={0.7} aria-hidden />
+                  )}
+                  {mediaType !== "image" && (
+                    <span
+                      style={{
+                        display: "inline-flex",
+                        alignItems: "center",
+                        gap: 6,
+                        fontSize: 12,
+                        fontWeight: 600,
+                        background: "rgba(0,0,0,.45)",
+                        borderRadius: 999,
+                        padding: "6px 12px",
+                      }}
+                    >
+                      <Video size={14} aria-hidden />
+                      {mediaType === "youtube" ? "YouTube" : "Video file"}
+                    </span>
+                  )}
                   <strong
                     style={{
                       position: "absolute",
@@ -215,7 +263,120 @@ export function SettingsClient() {
                 </div>
 
                 <div style={{ padding: 14 }}>
-                  <Field label="Background image URL" error={errors[`hero_settings.${page.key}.image_url`]}>
+                  {supportsVideo && (
+                    <Field
+                      label="Background media"
+                      error={errors[`hero_settings.${page.key}.media_type`]}
+                    >
+                      <div style={{ display: "flex", gap: 6, flexWrap: "wrap", marginBottom: 4 }}>
+                        {MEDIA_OPTIONS.map((option) => {
+                          const active = mediaType === option.value;
+                          return (
+                            <button
+                              key={option.value}
+                              type="button"
+                              className="admin-btn secondary"
+                              aria-pressed={active}
+                              onClick={() =>
+                                setHero(page.key, {
+                                  media_type: option.value,
+                                  video_url:
+                                    option.value === "image"
+                                      ? null
+                                      : hero.video_url ?? null,
+                                })
+                              }
+                              style={{
+                                flex: "1 1 auto",
+                                borderColor: active ? "var(--p6, #6B21A8)" : undefined,
+                                background: active ? "rgba(107,33,168,.08)" : undefined,
+                              }}
+                            >
+                              {option.label}
+                            </button>
+                          );
+                        })}
+                      </div>
+                    </Field>
+                  )}
+
+                  {supportsVideo && mediaType === "youtube" && (
+                    <Field
+                      label="YouTube URL or video ID"
+                      error={errors[`hero_settings.${page.key}.video_url`]}
+                    >
+                      <input
+                        className="admin-input"
+                        value={hero.video_url ?? ""}
+                        onChange={(event) =>
+                          setHero(page.key, {
+                            media_type: "youtube",
+                            video_url: event.target.value.trim() || null,
+                          })
+                        }
+                        placeholder="https://www.youtube.com/watch?v=… or video ID"
+                      />
+                    </Field>
+                  )}
+
+                  {supportsVideo && mediaType === "video" && (
+                    <>
+                      <Field
+                        label="Video file URL"
+                        error={errors[`hero_settings.${page.key}.video_url`]}
+                      >
+                        <input
+                          className="admin-input"
+                          type="url"
+                          value={hero.video_url ?? ""}
+                          onChange={(event) =>
+                            setHero(page.key, {
+                              media_type: "video",
+                              video_url: event.target.value.trim() || null,
+                            })
+                          }
+                          placeholder="https://….mp4"
+                        />
+                      </Field>
+                      <div style={{ display: "flex", gap: 8, marginBottom: 14 }}>
+                        <label className="admin-btn secondary" style={{ cursor: "pointer", flex: 1 }}>
+                          <Upload size={13} />
+                          {uploadingVideo ? "Uploading…" : "Upload video"}
+                          <input
+                            type="file"
+                            accept="video/mp4,video/webm,video/quicktime"
+                            hidden
+                            disabled={uploadingVideo}
+                            onChange={(event) => {
+                              void uploadHeroVideo(page.key, event.target.files?.[0]);
+                              event.currentTarget.value = "";
+                            }}
+                          />
+                        </label>
+                        <button
+                          type="button"
+                          className="admin-btn secondary"
+                          title="Clear video URL"
+                          onClick={() => setHero(page.key, { video_url: null })}
+                        >
+                          <RotateCcw size={13} />
+                          Clear
+                        </button>
+                      </div>
+                      <p style={{ margin: "0 0 14px", fontSize: 11, color: "var(--text-secondary)" }}>
+                        MP4 or WebM, max 80MB. Image below is used as poster/fallback.
+                      </p>
+                    </>
+                  )}
+
+                  <Field
+                    label={
+                      supportsVideo && mediaType !== "image"
+                        ? "Poster / fallback image URL"
+                        : "Background image URL"
+                    }
+                    error={errors[`hero_settings.${page.key}.image_url`]}
+                  >
                     <input
                       className="admin-input"
                       type="url"

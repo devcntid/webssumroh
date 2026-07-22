@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { requireAuth } from "@/lib/auth";
-import { uploadImage } from "@/lib/blob";
+import { uploadMedia } from "@/lib/blob";
 import { writeAuditLog } from "@/lib/queries/audit-logs";
 
 const CONTENT_ROLES = ["super_admin", "admin", "editor"] as const;
@@ -28,7 +28,7 @@ export async function POST(req: NextRequest) {
       : "uploads";
 
   try {
-    const result = await uploadImage(file, folder || "uploads");
+    const result = await uploadMedia(file, folder || "uploads");
 
     await writeAuditLog({
       admin_user_id: session.userId,
@@ -46,13 +46,25 @@ export async function POST(req: NextRequest) {
     if (e instanceof Error) {
       if (e.message === "UNSUPPORTED_FILE_TYPE") {
         return NextResponse.json(
-          { error: "Unsupported file type. Use JPEG, PNG, or WebP." },
+          { error: "Unsupported file type. Use JPEG, PNG, WebP, MP4, or WebM." },
+          { status: 422 }
+        );
+      }
+      if (e.message === "UNSUPPORTED_VIDEO_TYPE") {
+        return NextResponse.json(
+          { error: "Unsupported video type. Use MP4 or WebM." },
           { status: 422 }
         );
       }
       if (e.message === "FILE_TOO_LARGE") {
         return NextResponse.json(
-          { error: "File too large. Maximum size is 8MB." },
+          { error: "Image too large. Maximum size is 8MB." },
+          { status: 422 }
+        );
+      }
+      if (e.message === "VIDEO_TOO_LARGE") {
+        return NextResponse.json(
+          { error: "Video too large. Maximum size is 80MB." },
           { status: 422 }
         );
       }
