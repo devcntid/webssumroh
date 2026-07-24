@@ -31,7 +31,7 @@ import {
 } from "lucide-react";
 
 const USTADZ_IMG =
-  "https://images.unsplash.com/photo-1573483883644-d0b4b55eb25d?auto=format&fit=crop&w=760&h=950&q=80";
+  "https://0bquyt2mkiqwqmnf.public.blob.vercel-storage.com/media-library/1784865323474-ustadz_pembimbing.jpg";
 
 const HERO_BG =
   "https://images.unsplash.com/photo-1591604129939-f1efa4d9f7fa?auto=format&fit=crop&w=1920&q=85";
@@ -178,10 +178,6 @@ export default async function HomePage() {
                   height={950}
                   sizes="(max-width: 1024px) 100vw, 420px"
                 />
-              </div>
-              <div className="ustadz-stat">
-                <div className="ustadz-stat-num">1.000+</div>
-                <div className="ustadz-stat-label">Jamaah Dibimbing</div>
               </div>
             </div>
 

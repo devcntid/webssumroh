@@ -238,6 +238,22 @@ export interface GalleryItem {
   created_by: number | null;
 }
 
+/** Admin media library asset — reusable image URL for pages/forms. */
+export interface MediaAsset {
+  id: number;
+  title: string;
+  image_url: string;
+  alt_text: string | null;
+  file_size_kb: number | null;
+  width_px: number | null;
+  height_px: number | null;
+  created_at: string;
+  updated_at: string;
+  deleted_at: string | null;
+  created_by: number | null;
+  updated_by: number | null;
+}
+
 export interface TeamMember {
   id: number;
   full_name: string;

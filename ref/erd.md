@@ -344,6 +344,29 @@ CREATE INDEX idx_gallery_recent   ON gallery_items (created_at DESC)          WH
 
 
 -- ─────────────────────────────────────────────────────────────────────────────
+-- TABLE: media_assets
+-- Admin media library: reusable images + public URLs for pages/forms
+-- ─────────────────────────────────────────────────────────────────────────────
+CREATE TABLE media_assets (
+    id              BIGSERIAL    PRIMARY KEY,
+    title           VARCHAR(200) NOT NULL,
+    image_url       TEXT         NOT NULL,
+    alt_text        VARCHAR(200),
+    file_size_kb    INTEGER,
+    width_px        SMALLINT,
+    height_px       SMALLINT,
+    created_at      TIMESTAMPTZ  NOT NULL DEFAULT NOW(),
+    updated_at      TIMESTAMPTZ  NOT NULL DEFAULT NOW(),
+    deleted_at      TIMESTAMPTZ,
+    created_by      BIGINT       REFERENCES admin_users(id) ON DELETE SET NULL,
+    updated_by      BIGINT       REFERENCES admin_users(id) ON DELETE SET NULL
+);
+
+CREATE INDEX idx_media_assets_recent ON media_assets (created_at DESC) WHERE deleted_at IS NULL;
+CREATE INDEX idx_media_assets_title  ON media_assets (title) WHERE deleted_at IS NULL;
+
+
+-- ─────────────────────────────────────────────────────────────────────────────
 -- TABLE: team_members
 -- ─────────────────────────────────────────────────────────────────────────────
 CREATE TABLE team_members (
@@ -472,6 +495,8 @@ $$;
 | `testimonials` | `created_by`, `updated_by` | `admin_users.id` | SET NULL |
 | `faqs` | `created_by`, `updated_by` | `admin_users.id` | SET NULL |
 | `gallery_items` | `created_by` | `admin_users.id` | SET NULL |
+| `media_assets` | `created_by` | `admin_users.id` | SET NULL |
+| `media_assets` | `updated_by` | `admin_users.id` | SET NULL |
 | `team_members` | `created_by` | `admin_users.id` | SET NULL |
 | `contact_leads` | `assigned_to` | `admin_users.id` | SET NULL |
 | `corporate_inquiries` | `assigned_to` | `admin_users.id` | SET NULL |

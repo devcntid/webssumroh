@@ -17,6 +17,7 @@ export const ADMIN_NAV: NavItem[] = [
   { href: "/panel/testimonials", id: "testimonials", label: "Testimonials", roles: ["super_admin", "admin", "editor"] },
   { href: "/panel/faqs", id: "faqs", label: "FAQ", roles: ["super_admin", "admin", "editor"] },
   { href: "/panel/gallery", id: "gallery", label: "Gallery", roles: ["super_admin", "admin", "editor"] },
+  { href: "/panel/media", id: "media", label: "Media library", roles: ["super_admin", "admin", "editor"] },
   { href: "/panel/team", id: "team", label: "Team", roles: ["super_admin", "admin", "editor"] },
   { href: "/panel/leads", id: "leads", label: "Leads", roles: ["super_admin", "admin", "cs_agent"] },
   { href: "/panel/corporate", id: "corporate", label: "Corporate inquiries", roles: ["super_admin", "admin", "cs_agent"] },

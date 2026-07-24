@@ -36,6 +36,13 @@
       "when": 1784852000000,
       "tag": "0004_add_package_detail_text",
       "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1784853000000,
+      "tag": "0005_add_media_assets",
+      "breakpoints": true
     }
   ]
 }

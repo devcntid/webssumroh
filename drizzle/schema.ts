@@ -229,6 +229,24 @@ export const galleryItems = pgTable("gallery_items", {
 });
 
 // ─────────────────────────────────────────────────────────────────────────────
+// TABLE: media_assets
+// ─────────────────────────────────────────────────────────────────────────────
+export const mediaAssets = pgTable("media_assets", {
+  id: bigserial("id", { mode: "number" }).primaryKey(),
+  title: varchar("title", { length: 200 }).notNull(),
+  image_url: text("image_url").notNull(),
+  alt_text: varchar("alt_text", { length: 200 }),
+  file_size_kb: integer("file_size_kb"),
+  width_px: smallint("width_px"),
+  height_px: smallint("height_px"),
+  created_at: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+  updated_at: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
+  deleted_at: timestamp("deleted_at", { withTimezone: true }),
+  created_by: bigint("created_by", { mode: "number" }),
+  updated_by: bigint("updated_by", { mode: "number" }),
+});
+
+// ─────────────────────────────────────────────────────────────────────────────
 // TABLE: team_members
 // ─────────────────────────────────────────────────────────────────────────────
 export const teamMembers = pgTable("team_members", {
