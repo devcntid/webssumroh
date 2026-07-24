@@ -9,6 +9,12 @@ import { extractYoutubeId } from "@/lib/hero-settings";
 
 const SETTINGS_ROLES = ["super_admin", "admin"] as const;
 
+const HeroSlideSchema = z.object({
+  title: z.string().min(1).max(200),
+  description: z.string().min(1).max(600),
+  image_url: z.string().url().nullable(),
+});
+
 const HeroAppearanceSchema = z
   .object({
     image_url: z.string().url().nullable(),
@@ -17,6 +23,7 @@ const HeroAppearanceSchema = z
       .regex(/^#[0-9A-Fa-f]{6}$/, "Use a 6-digit hex color"),
     media_type: z.enum(["image", "youtube", "video"]).optional().default("image"),
     video_url: z.string().nullable().optional(),
+    slides: z.array(HeroSlideSchema).min(1).max(3).optional(),
   })
   .superRefine((value, ctx) => {
     const videoUrl = value.video_url?.trim() || null;
@@ -58,8 +65,18 @@ const HeroAppearanceSchema = z
     video_url: value.video_url?.trim() || null,
   }));
 
+const HomeHeroAppearanceSchema = HeroAppearanceSchema.superRefine((value, ctx) => {
+  if (!value.slides || value.slides.length < 1) {
+    ctx.addIssue({
+      code: "custom",
+      path: ["slides"],
+      message: "Home hero needs at least 1 content slide",
+    });
+  }
+});
+
 const HeroSettingsSchema = z.object({
-  home: HeroAppearanceSchema.optional(),
+  home: HomeHeroAppearanceSchema.optional(),
   "paket-umroh": HeroAppearanceSchema.optional(),
   korporat: HeroAppearanceSchema.optional(),
   destinasi: HeroAppearanceSchema.optional(),

@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
-import { Image as ImageIcon, RotateCcw, Save, Upload, Video } from "lucide-react";
+import { Image as ImageIcon, Plus, RotateCcw, Save, Trash2, Upload, Video } from "lucide-react";
 import { HexColorInput, HexColorPicker } from "react-colorful";
 import { Field } from "@/components/admin/ui/Field";
 import { Btn } from "@/components/admin/ui/Btn";
@@ -10,10 +10,12 @@ import { fetchJson, issuesToFieldErrors } from "@/components/admin/lib/fetch-jso
 import { DEFAULT_LOGO_COLOR_URL, DEFAULT_LOGO_WHITE_URL } from "@/lib/brand";
 import {
   DEFAULT_HERO_COLOR,
+  DEFAULT_HOME_SLIDES,
   HERO_PAGES,
   normalizeHeroSettings,
+  normalizeHomeSlides,
 } from "@/lib/hero-settings";
-import type { HeroAppearance, HeroMediaType, HeroPageKey, SiteSetting } from "@/types/db";
+import type { HeroAppearance, HeroMediaType, HeroPageKey, HeroSlide, SiteSetting } from "@/types/db";
 
 type Form = {
   phone_display: string;
@@ -53,6 +55,7 @@ export function SettingsClient() {
   const [saving, setSaving] = useState(false);
   const [uploadingPage, setUploadingPage] = useState<HeroPageKey | null>(null);
   const [uploadingVideoPage, setUploadingVideoPage] = useState<HeroPageKey | null>(null);
+  const [uploadingSlideIndex, setUploadingSlideIndex] = useState<number | null>(null);
   const [uploadingLogo, setUploadingLogo] = useState<"color" | "white" | null>(null);
   const [activeColorPicker, setActiveColorPicker] = useState<HeroPageKey | null>(null);
 
@@ -117,6 +120,51 @@ export function SettingsClient() {
         [page]: { ...current.hero_settings[page], ...patch },
       },
     }));
+  }
+
+  function setHomeSlides(next: HeroSlide[]) {
+    setHero("home", { slides: normalizeHomeSlides(next) });
+  }
+
+  function patchHomeSlide(index: number, patch: Partial<HeroSlide>) {
+    const slides = [...(form.hero_settings.home.slides ?? DEFAULT_HOME_SLIDES)];
+    slides[index] = { ...slides[index], ...patch };
+    setHomeSlides(slides);
+  }
+
+  function addHomeSlide() {
+    const slides = [...(form.hero_settings.home.slides ?? DEFAULT_HOME_SLIDES)];
+    if (slides.length >= 3) return;
+    slides.push({
+      title: `Judul slide ${slides.length + 1}`,
+      description: "Tulis deskripsi singkat untuk slide hero ini.",
+      image_url: DEFAULT_HOME_SLIDES[0].image_url,
+    });
+    setHomeSlides(slides);
+  }
+
+  function removeHomeSlide(index: number) {
+    const slides = [...(form.hero_settings.home.slides ?? DEFAULT_HOME_SLIDES)];
+    if (slides.length <= 1) return;
+    slides.splice(index, 1);
+    setHomeSlides(slides);
+  }
+
+  async function uploadHomeSlideImage(index: number, file?: File) {
+    if (!file) return;
+    setUploadingSlideIndex(index);
+    const body = new FormData();
+    body.append("file", file);
+    body.append("folder", `heroes/home/slides`);
+    const response = await fetch("/api/upload", { method: "POST", body });
+    const json = await response.json().catch(() => ({}));
+    setUploadingSlideIndex(null);
+    if (!response.ok || !json.data?.url) {
+      showToast(json.error || "Failed to upload slide image", "error");
+      return;
+    }
+    patchHomeSlide(index, { image_url: json.data.url as string });
+    showToast("Slide image uploaded. Save settings to publish it.");
   }
 
   async function uploadHero(page: HeroPageKey, file?: File) {
@@ -625,6 +673,193 @@ export function SettingsClient() {
                       )}
                     </div>
                   </Field>
+                </div>
+              </section>
+            );
+          })}
+        </div>
+      </div>
+
+      <div className="admin-card" style={{ marginTop: 20 }}>
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "space-between",
+            gap: 12,
+            alignItems: "flex-start",
+            marginBottom: 18,
+            flexWrap: "wrap",
+          }}
+        >
+          <div>
+            <h3 style={{ margin: "0 0 5px", fontSize: 15 }}>Home hero content slides</h3>
+            <p style={{ margin: 0, fontSize: 12, color: "var(--text-secondary)" }}>
+              Edit 1–3 slides (title, description, right-side image). Use *text* in the title for
+              gold emphasis. Slides auto-rotate with fade/slide on the homepage.
+            </p>
+          </div>
+          <Btn
+            variant="secondary"
+            icon={Plus}
+            onClick={addHomeSlide}
+            disabled={(form.hero_settings.home.slides?.length ?? 0) >= 3}
+          >
+            Add slide
+          </Btn>
+        </div>
+
+        <div style={{ display: "grid", gap: 16 }}>
+          {(form.hero_settings.home.slides ?? DEFAULT_HOME_SLIDES).map((slide, index) => {
+            const uploadingSlide = uploadingSlideIndex === index;
+            return (
+              <section
+                key={`home-slide-${index}`}
+                style={{
+                  border: "1px solid var(--border)",
+                  borderRadius: 14,
+                  padding: 16,
+                  background: "#fff",
+                }}
+                aria-label={`Home hero slide ${index + 1}`}
+              >
+                <div
+                  style={{
+                    display: "flex",
+                    justifyContent: "space-between",
+                    alignItems: "center",
+                    marginBottom: 12,
+                    gap: 8,
+                  }}
+                >
+                  <strong style={{ fontSize: 13 }}>Slide {index + 1}</strong>
+                  <button
+                    type="button"
+                    className="admin-btn secondary"
+                    disabled={(form.hero_settings.home.slides?.length ?? 0) <= 1}
+                    onClick={() => removeHomeSlide(index)}
+                    title="Remove slide"
+                  >
+                    <Trash2 size={13} />
+                    Remove
+                  </button>
+                </div>
+
+                <div
+                  style={{
+                    display: "grid",
+                    gridTemplateColumns: "minmax(0,1fr) 160px",
+                    gap: 16,
+                  }}
+                >
+                  <div>
+                    <Field
+                      label="Title"
+                      required
+                      error={errors[`hero_settings.home.slides.${index}.title`]}
+                    >
+                      <input
+                        className="admin-input"
+                        value={slide.title}
+                        onChange={(event) =>
+                          patchHomeSlide(index, { title: event.target.value })
+                        }
+                        placeholder="Wujudkan Umroh yang *Khusyuk*…"
+                      />
+                    </Field>
+                    <Field
+                      label="Description"
+                      required
+                      error={errors[`hero_settings.home.slides.${index}.description`]}
+                    >
+                      <textarea
+                        className="admin-input"
+                        rows={4}
+                        value={slide.description}
+                        onChange={(event) =>
+                          patchHomeSlide(index, { description: event.target.value })
+                        }
+                        placeholder="Short supporting paragraph…"
+                      />
+                    </Field>
+                    <Field
+                      label="Side image URL"
+                      error={errors[`hero_settings.home.slides.${index}.image_url`]}
+                    >
+                      <input
+                        className="admin-input"
+                        type="url"
+                        value={slide.image_url ?? ""}
+                        onChange={(event) =>
+                          patchHomeSlide(index, {
+                            image_url: event.target.value.trim() || null,
+                          })
+                        }
+                        placeholder="https://…"
+                      />
+                    </Field>
+                    <div style={{ display: "flex", gap: 8 }}>
+                      <label
+                        className="admin-btn secondary"
+                        style={{ cursor: "pointer", flex: 1 }}
+                      >
+                        <Upload size={13} />
+                        {uploadingSlide ? "Uploading…" : "Upload image"}
+                        <input
+                          type="file"
+                          accept="image/jpeg,image/png,image/webp"
+                          hidden
+                          disabled={uploadingSlide}
+                          onChange={(event) => {
+                            void uploadHomeSlideImage(index, event.target.files?.[0]);
+                            event.currentTarget.value = "";
+                          }}
+                        />
+                      </label>
+                      <button
+                        type="button"
+                        className="admin-btn secondary"
+                        onClick={() =>
+                          patchHomeSlide(index, {
+                            image_url: DEFAULT_HOME_SLIDES[0].image_url,
+                          })
+                        }
+                      >
+                        <RotateCcw size={13} />
+                        Default
+                      </button>
+                    </div>
+                  </div>
+
+                  <div
+                    style={{
+                      borderRadius: 12,
+                      overflow: "hidden",
+                      border: "1px solid var(--border)",
+                      background: "#f4f4f5",
+                      aspectRatio: "4 / 5",
+                      position: "relative",
+                    }}
+                  >
+                    {slide.image_url ? (
+                      // eslint-disable-next-line @next/next/no-img-element
+                      <img
+                        src={slide.image_url}
+                        alt=""
+                        style={{ width: "100%", height: "100%", objectFit: "cover" }}
+                      />
+                    ) : (
+                      <div
+                        style={{
+                          display: "grid",
+                          placeItems: "center",
+                          height: "100%",
+                          color: "var(--text-secondary)",
+                        }}
+                      >
+                        <ImageIcon size={28} aria-hidden />
+                      </div>
+                    )}
+                  </div>
                 </div>
               </section>
             );

@@ -209,6 +209,12 @@ h1,h2,h3,h4{font-family:var(--font-h);line-height:1.18;letter-spacing:-0.01em}
 .pkg-card--green .pkg-cta-primary:hover{box-shadow:0 9px 24px rgba(15,107,69,.36)}
 .pkg-cta-outline{display:inline-flex;align-items:center;justify-content:center;gap:6px;border:1.5px solid var(--n1);color:var(--n7);font-family:var(--font-h);font-size:13px;font-weight:500;padding:12px 18px;border-radius:12px;transition:border-color .2s,background .2s,color .2s;text-decoration:none}
 .pkg-cta-outline:hover{border-color:var(--p6);color:var(--p7);background:var(--p0)}
+.pkg-card--thumb{padding:0}
+.pkg-thumb{width:100%;aspect-ratio:4/5;overflow:hidden;background:linear-gradient(135deg,var(--p1),rgba(212,160,23,.1));position:relative;padding:0;border:0;display:block;cursor:zoom-in}
+.pkg-thumb img{width:100%;height:100%;object-fit:cover;display:block}
+.pkg-thumb--empty{display:flex;align-items:center;justify-content:center;color:var(--p6);cursor:default}
+.pkg-thumb:focus-visible{outline:2px solid var(--p6);outline-offset:-2px}
+.pkg-body--thumb{padding:16px 18px 18px;flex:0}
 .pkg-more-link{display:inline-flex;align-items:center;gap:6px;font-family:var(--font-h);font-size:14px;font-weight:600;color:var(--p6);transition:color .18s}
 .pkg-more-link:hover{color:var(--p7);text-decoration:underline}
 /* Pembimbing Ibadah section */
@@ -263,7 +269,30 @@ footer{background:var(--p9);border-top:1px solid rgba(255,255,255,.05);padding:c
 /* Homepage fullscreen hero */
 .home-hero{min-height:100vh;min-height:100dvh;display:flex;align-items:center;position:relative;overflow:hidden;padding-top:var(--nav-h)}
 .home-hero-inner{position:relative;z-index:2;width:100%;padding-block:clamp(56px,10vw,108px)}
-.home-hero-copy{max-width:80%}
+.home-hero-layout{display:grid;grid-template-columns:minmax(0,1.15fr) minmax(0,.85fr);gap:clamp(28px,5vw,64px);align-items:center}
+.home-hero-copy{max-width:none;min-width:0}
+.home-hero-slide-copy{will-change:opacity,transform}
+.home-hero-visual{position:relative;min-width:0;justify-self:end;width:min(100%,440px)}
+.home-hero-visual-frame{position:relative;aspect-ratio:4/5;width:100%;border-radius:22px;overflow:hidden;box-shadow:0 28px 60px rgba(0,0,0,.35);border:1px solid rgba(255,255,255,.14);will-change:opacity,transform}
+.home-hero-visual-img{object-fit:cover}
+.home-hero-visual-fallback{position:absolute;inset:0;background:linear-gradient(160deg,rgba(124,58,190,.45),rgba(26,5,51,.8))}
+.home-hero-anim-next{animation:homeHeroInNext .7s cubic-bezier(.22,1,.36,1) both}
+.home-hero-anim-prev{animation:homeHeroInPrev .7s cubic-bezier(.22,1,.36,1) both}
+@keyframes homeHeroInNext{
+  from{opacity:0;transform:translateX(28px)}
+  to{opacity:1;transform:translateX(0)}
+}
+@keyframes homeHeroInPrev{
+  from{opacity:0;transform:translateX(-28px)}
+  to{opacity:1;transform:translateX(0)}
+}
+.home-hero-dots{display:flex;align-items:center;gap:8px;margin:0 0 clamp(18px,2.4vw,26px)}
+.home-hero-dot{width:9px;height:9px;border-radius:999px;border:0;padding:0;cursor:pointer;background:rgba(255,255,255,.28);transition:width .25s ease,background .25s ease}
+.home-hero-dot.is-active{width:26px;background:var(--g6)}
+.home-hero-dot:focus-visible{outline:2px solid var(--g6);outline-offset:3px}
+@media (prefers-reduced-motion: reduce){
+  .home-hero-anim-next,.home-hero-anim-prev{animation:none}
+}
 .ph-bg{position:absolute;inset:0;background-size:cover;background-position:center 30%;z-index:0}
 .ph-bg::after{content:'';position:absolute;inset:0;z-index:1;background:linear-gradient(155deg,color-mix(in srgb,var(--hero-color,#1a0533) 96%,transparent) 0%,color-mix(in srgb,var(--hero-color,#1a0533) 90%,transparent) 35%,color-mix(in srgb,var(--hero-color,#1a0533) 82%,transparent) 60%,color-mix(in srgb,var(--hero-color,#1a0533) 94%,transparent) 100%)}
 /* Hero background video (YouTube embed or self-hosted file) — sits under .ph-bg::after overlay */
@@ -348,7 +377,7 @@ footer{background:var(--p9);border-top:1px solid rgba(255,255,255,.05);padding:c
 .package-list-details summary::before{content:'▸ ';display:inline-block;transition:transform .15s}
 .package-list-details[open] summary::before{transform:rotate(90deg)}
 .package-list-description--full{white-space:pre-line;font-size:13px;color:var(--n7);line-height:1.65;margin:0;padding:12px 14px;background:var(--n0);border:1px solid var(--n1);border-radius:12px;max-height:280px;overflow:auto}
-.package-lightbox{position:fixed;inset:0;z-index:200;background:rgba(10,1,26,.88);display:flex;align-items:center;justify-content:center;padding:24px;cursor:zoom-out}
+.package-lightbox{position:fixed;inset:0;z-index:1000;background:rgba(10,1,26,.88);display:flex;align-items:center;justify-content:center;padding:24px;cursor:zoom-out}
 .package-lightbox-img{max-width:min(96vw,1100px);max-height:92vh;width:auto;height:auto;object-fit:contain;border-radius:12px;box-shadow:0 24px 80px rgba(0,0,0,.45);cursor:default}
 .package-lightbox-close{position:absolute;top:18px;right:18px;width:42px;height:42px;border-radius:999px;border:0;background:rgba(255,255,255,.12);color:#fff;display:flex;align-items:center;justify-content:center;cursor:pointer}
 .package-lightbox-close:hover{background:rgba(255,255,255,.22)}
@@ -502,6 +531,8 @@ footer{background:var(--p9);border-top:1px solid rgba(255,255,255,.05);padding:c
   .nav-logo{height:32px}
   .nav-logo-img{height:32px}
   .home-hero-copy,.cta-inner{max-width:100%}
+  .home-hero-layout{grid-template-columns:1fr;gap:28px}
+  .home-hero-visual{width:min(100%,360px);justify-self:start}
   .home-hero-inner{padding-block:clamp(28px,7vw,56px) clamp(88px,14vw,120px)}
   .page-hero{padding-bottom:clamp(72px,12vw,96px)}
   .ph-eyebrow{max-width:100%;font-size:11px;padding:7px 12px;gap:8px;white-space:normal;line-height:1.35}

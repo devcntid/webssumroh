@@ -25,6 +25,13 @@ export type HeroPageKey =
 
 export type HeroMediaType = "image" | "youtube" | "video";
 
+/** Home hero content slide (title + description + right-side image). */
+export interface HeroSlide {
+  title: string;
+  description: string;
+  image_url: string | null;
+}
+
 export interface HeroAppearance {
   image_url: string | null;
   background_color: string;
@@ -32,6 +39,11 @@ export interface HeroAppearance {
   media_type?: HeroMediaType;
   /** YouTube URL/ID or direct .mp4/.webm file URL. */
   video_url?: string | null;
+  /**
+   * Home only: 1–3 content slides (title, description, side image).
+   * Other pages ignore this field.
+   */
+  slides?: HeroSlide[];
 }
 
 export type HeroSettings = Partial<Record<HeroPageKey, HeroAppearance>>;

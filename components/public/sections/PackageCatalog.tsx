@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { createPortal } from "react-dom";
 import Image from "next/image";
 import { MapPin, MessageCircle, Plane, X, ZoomIn } from "lucide-react";
 import type { Package, PackageCategory } from "@/types/db";
@@ -34,23 +35,59 @@ export function PackageCatalog({
 }: PackageCatalogProps) {
   const [filter, setFilter] = useState<FilterValue>("all");
   const [zoom, setZoom] = useState<{ src: string; alt: string } | null>(null);
+  const [mounted, setMounted] = useState(false);
   const visiblePackages =
     filter === "all"
       ? packages
       : packages.filter((pkg) => pkg.category === filter);
 
   useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  useEffect(() => {
     if (!zoom) return;
     const onKey = (event: KeyboardEvent) => {
       if (event.key === "Escape") setZoom(null);
     };
+    const previousOverflow = document.body.style.overflow;
     document.body.style.overflow = "hidden";
     window.addEventListener("keydown", onKey);
     return () => {
-      document.body.style.overflow = "";
+      document.body.style.overflow = previousOverflow;
       window.removeEventListener("keydown", onKey);
     };
   }, [zoom]);
+
+  const lightbox =
+    mounted &&
+    zoom &&
+    createPortal(
+      <div
+        className="package-lightbox"
+        role="dialog"
+        aria-modal="true"
+        aria-label={zoom.alt}
+        onClick={() => setZoom(null)}
+      >
+        <button
+          type="button"
+          className="package-lightbox-close"
+          aria-label="Tutup"
+          onClick={() => setZoom(null)}
+        >
+          <X size={20} />
+        </button>
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img
+          src={zoom.src}
+          alt={zoom.alt}
+          className="package-lightbox-img"
+          onClick={(event) => event.stopPropagation()}
+        />
+      </div>,
+      document.body
+    );
 
   return (
     <>
@@ -170,31 +207,7 @@ export function PackageCatalog({
         </div>
       </section>
 
-      {zoom && (
-        <div
-          className="package-lightbox"
-          role="dialog"
-          aria-modal="true"
-          aria-label={zoom.alt}
-          onClick={() => setZoom(null)}
-        >
-          <button
-            type="button"
-            className="package-lightbox-close"
-            aria-label="Tutup"
-            onClick={() => setZoom(null)}
-          >
-            <X size={20} />
-          </button>
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img
-            src={zoom.src}
-            alt={zoom.alt}
-            className="package-lightbox-img"
-            onClick={(event) => event.stopPropagation()}
-          />
-        </div>
-      )}
+      {lightbox}
     </>
   );
 }

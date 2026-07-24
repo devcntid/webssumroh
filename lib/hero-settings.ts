@@ -1,9 +1,11 @@
-import type { CSSProperties } from "react";
+import type { CSSProperties, ReactNode } from "react";
+import { createElement } from "react";
 import type {
   HeroAppearance,
   HeroMediaType,
   HeroPageKey,
   HeroSettings,
+  HeroSlide,
   SiteSetting,
 } from "@/types/db";
 
@@ -13,8 +15,10 @@ export const HERO_PAGES: ReadonlyArray<{
   route: string;
   /** Home supports background video (YouTube or uploaded file). */
   supportsVideo?: boolean;
+  /** Home supports editable content slides (title, description, side image). */
+  supportsSlides?: boolean;
 }> = [
-  { key: "home", label: "Home", route: "/", supportsVideo: true },
+  { key: "home", label: "Home", route: "/", supportsVideo: true, supportsSlides: true },
   { key: "paket-umroh", label: "Umroh", route: "/paket-umroh" },
   { key: "korporat", label: "Korporat", route: "/korporat" },
   { key: "destinasi", label: "Destinasi", route: "/destinasi" },
@@ -27,20 +31,87 @@ export const HERO_PAGES: ReadonlyArray<{
 
 export const DEFAULT_HERO_COLOR = "#1A0533";
 
+export const DEFAULT_HOME_SLIDE_IMAGE =
+  "https://images.unsplash.com/photo-1564769625905-50e93615e769?auto=format&fit=crop&w=900&h=1120&q=80";
+
+export const DEFAULT_HOME_SLIDES: HeroSlide[] = [
+  {
+    title: "Wujudkan Umroh yang *Khusyuk*, Nyaman & Penuh Berkah",
+    description:
+      "PT. Sarana Sadaya (SS Umroh) mendampingi perjalanan ibadah Anda dengan hotel dekat masjid, direct flight, dan bimbingan ustadz berpengalaman — amanah sejak 2012.",
+    image_url: DEFAULT_HOME_SLIDE_IMAGE,
+  },
+];
+
+const MAX_HOME_SLIDES = 3;
+
+export function normalizeHeroSlide(
+  value?: Partial<HeroSlide> | null,
+  fallback: HeroSlide = DEFAULT_HOME_SLIDES[0]
+): HeroSlide {
+  const title = typeof value?.title === "string" ? value.title.trim() : "";
+  const description =
+    typeof value?.description === "string" ? value.description.trim() : "";
+  const imageUrl =
+    typeof value?.image_url === "string" && value.image_url.trim()
+      ? value.image_url.trim()
+      : null;
+
+  return {
+    title: title || fallback.title,
+    description: description || fallback.description,
+    image_url: imageUrl ?? fallback.image_url,
+  };
+}
+
+/** Normalize 1–3 home content slides; empty input falls back to defaults. */
+export function normalizeHomeSlides(
+  value?: HeroSlide[] | null
+): HeroSlide[] {
+  const source = Array.isArray(value) ? value.slice(0, MAX_HOME_SLIDES) : [];
+  if (source.length === 0) {
+    return DEFAULT_HOME_SLIDES.map((slide) => ({ ...slide }));
+  }
+  return source.map((slide, index) =>
+    normalizeHeroSlide(slide, DEFAULT_HOME_SLIDES[Math.min(index, DEFAULT_HOME_SLIDES.length - 1)])
+  );
+}
+
 export function normalizeHeroAppearance(
-  value?: Partial<HeroAppearance> | null
+  value?: Partial<HeroAppearance> | null,
+  options?: { includeSlides?: boolean }
 ): HeroAppearance {
   const mediaType: HeroMediaType =
     value?.media_type === "youtube" || value?.media_type === "video"
       ? value.media_type
       : "image";
 
-  return {
+  const base: HeroAppearance = {
     image_url: value?.image_url ?? null,
     background_color: value?.background_color ?? DEFAULT_HERO_COLOR,
     media_type: mediaType,
     video_url: value?.video_url ?? null,
   };
+
+  if (options?.includeSlides) {
+    base.slides = normalizeHomeSlides(value?.slides);
+  }
+
+  return base;
+}
+
+/**
+ * Render title with optional *emphasis* markers as gold `<em>` spans.
+ * Example: "Umroh yang *Khusyuk*" → Umroh yang <em>Khusyuk</em>
+ */
+export function formatHeroTitle(title: string): ReactNode[] {
+  const parts = title.split(/(\*[^*]+\*)/g).filter(Boolean);
+  return parts.map((part, index) => {
+    if (part.startsWith("*") && part.endsWith("*") && part.length > 2) {
+      return createElement("em", { key: index }, part.slice(1, -1));
+    }
+    return createElement("span", { key: index }, part);
+  });
 }
 
 export function normalizeHeroSettings(
@@ -48,7 +119,9 @@ export function normalizeHeroSettings(
 ): Record<HeroPageKey, HeroAppearance> {
   const normalized = {} as Record<HeroPageKey, HeroAppearance>;
   for (const page of HERO_PAGES) {
-    normalized[page.key] = normalizeHeroAppearance(value?.[page.key]);
+    normalized[page.key] = normalizeHeroAppearance(value?.[page.key], {
+      includeSlides: Boolean(page.supportsSlides),
+    });
   }
   return normalized;
 }
@@ -58,11 +131,18 @@ export function resolveHeroAppearance(
   page: HeroPageKey,
   fallbackImage: string | null
 ): HeroAppearance {
-  const configured = normalizeHeroAppearance(settings?.hero_settings?.[page]);
+  const pageMeta = HERO_PAGES.find((item) => item.key === page);
+  const configured = normalizeHeroAppearance(settings?.hero_settings?.[page], {
+    includeSlides: Boolean(pageMeta?.supportsSlides),
+  });
   return {
     ...configured,
     image_url: configured.image_url || fallbackImage,
   };
+}
+
+export function resolveHomeSlides(settings: SiteSetting | null): HeroSlide[] {
+  return normalizeHomeSlides(settings?.hero_settings?.home?.slides);
 }
 
 export function heroSectionStyle(hero: HeroAppearance): CSSProperties {

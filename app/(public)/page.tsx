@@ -8,8 +8,10 @@ import {
   heroBackgroundStyle,
   heroSectionStyle,
   resolveHeroAppearance,
+  resolveHomeSlides,
 } from "@/lib/hero-settings";
 import { HeroMediaBackground } from "@/components/public/sections/HeroMediaBackground";
+import { HomeHeroSlider } from "@/components/public/sections/HomeHeroSlider";
 import { PackageCard } from "@/components/Home/PackageCard";
 import { TestimonialCard } from "@/components/Home/TestimonialCard";
 import { FAQList } from "@/components/Home/FAQList";
@@ -53,6 +55,7 @@ export default async function HomePage() {
   const phone = settings?.phone_display || "0813-1201-7883";
   const license = settings?.ppiu_license || "SK PPIU No.U.108/2021";
   const hero = resolveHeroAppearance(settings, "home", HERO_BG);
+  const heroSlides = resolveHomeSlides(settings);
   const waUrl = `https://wa.me/${settings?.whatsapp_number || "6281312017883"}?text=Assalamu%27alaikum%20SS%20Umroh%2C%20saya%20ingin%20konsultasi%20paket%20umroh.`;
 
   return (
@@ -69,22 +72,15 @@ export default async function HomePage() {
         <div className="ph-glow-secondary" />
 
         <div className="container home-hero-inner">
-          <div className="home-hero-copy">
-            <div className="ph-eyebrow">
-              <span className="ph-eyebrow-dot" aria-hidden />
-              Berizin Kemenag · Bandung · Sejak 2012
-            </div>
-
-            <h1 className="ph-h1">
-              Wujudkan Umroh yang <em>Khusyuk</em>, Nyaman &amp; Penuh Berkah
-            </h1>
-
-            <p className="ph-sub">
-              PT. Sarana Sadaya (SS Umroh) mendampingi perjalanan ibadah Anda dengan
-              hotel dekat masjid, direct flight, dan bimbingan ustadz berpengalaman —
-              amanah sejak 2012.
-            </p>
-
+          <HomeHeroSlider
+            slides={heroSlides}
+            eyebrow={
+              <div className="ph-eyebrow">
+                <span className="ph-eyebrow-dot" aria-hidden />
+                Berizin Kemenag · Bandung · Sejak 2012
+              </div>
+            }
+          >
             <div className="ph-chips" role="list">
               <span className="badge-hero ok" role="listitem">
                 <ShieldCheck size={14} aria-hidden /> {license.replace(" Tahun ", "/")}
@@ -108,7 +104,7 @@ export default async function HomePage() {
                 Lihat Paket Umroh →
               </Link>
             </div>
-          </div>
+          </HomeHeroSlider>
         </div>
       </section>
 
@@ -162,7 +158,7 @@ export default async function HomePage() {
           </div>
 
           <div className="section-footer">
-            <Link href="/jadwal" className="pkg-more-link">
+            <Link href="/paket-umroh" className="pkg-more-link">
               Lihat semua jadwal keberangkatan →
             </Link>
           </div>
