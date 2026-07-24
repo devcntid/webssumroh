@@ -61,7 +61,6 @@ const HeroAppearanceSchema = z
 const HeroSettingsSchema = z.object({
   home: HeroAppearanceSchema.optional(),
   "paket-umroh": HeroAppearanceSchema.optional(),
-  "halal-tour": HeroAppearanceSchema.optional(),
   korporat: HeroAppearanceSchema.optional(),
   destinasi: HeroAppearanceSchema.optional(),
   "tentang-kami": HeroAppearanceSchema.optional(),
@@ -78,6 +77,8 @@ const UpdateSchema = z.object({
   cs_name: z.string().min(1).max(100),
   ppiu_license: z.string().min(1).max(100),
   maps_embed_url: z.string().url().nullable().optional(),
+  logo_url: z.string().url().nullable().optional(),
+  logo_white_url: z.string().url().nullable().optional(),
   hero_settings: HeroSettingsSchema,
 });
 
@@ -108,10 +109,10 @@ export async function PUT(req: NextRequest) {
   if (!result) return NextResponse.json({ error: "Not found" }, { status: 404 });
 
   await invalidate(CACHE_KEYS.SITE_SETTINGS);
+  revalidatePath("/", "layout");
   for (const path of [
     "/",
     "/paket-umroh",
-    "/halal-tour",
     "/korporat",
     "/destinasi",
     "/tentang-kami",

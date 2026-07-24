@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
-import { Plus, Edit2, Trash2, Save, Search, GripVertical } from "lucide-react";
+import { Plus, Edit2, Trash2, Save, Search, GripVertical, Upload, RotateCcw } from "lucide-react";
 import { Badge } from "@/components/admin/ui/Badge";
 import { Toggle } from "@/components/admin/ui/Toggle";
 import { Btn } from "@/components/admin/ui/Btn";
@@ -20,10 +20,13 @@ type Form = {
   name: string;
   category: PackageCategory;
   tag_line: string;
+  description: string;
+  detail_text: string;
   hotel_distance_m: string;
   flight_type: string;
   price_mode: PriceMode;
   price_display_text: string;
+  cover_image_url: string;
   is_featured: boolean;
   is_active: boolean;
 };
@@ -33,10 +36,13 @@ const EMPTY: Form = {
   name: "",
   category: "hemat",
   tag_line: "",
+  description: "",
+  detail_text: "",
   hotel_distance_m: "350",
   flight_type: "Direct ✈",
   price_mode: "contact",
   price_display_text: "Hubungi CS",
+  cover_image_url: "",
   is_featured: false,
   is_active: true,
 };
@@ -57,6 +63,7 @@ export function PackagesClient() {
   const [deleteId, setDeleteId] = useState<number | null>(null);
   const [deleting, setDeleting] = useState(false);
   const [reorderMode, setReorderMode] = useState(false);
+  const [uploading, setUploading] = useState(false);
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -110,15 +117,35 @@ export function PackagesClient() {
       name: r.name,
       category: r.category,
       tag_line: r.tag_line ?? "",
+      description: r.description ?? "",
+      detail_text: r.detail_text ?? "",
       hotel_distance_m: r.hotel_distance_m != null ? String(r.hotel_distance_m) : "",
       flight_type: r.flight_type ?? "",
       price_mode: r.price_mode,
       price_display_text: r.price_display_text ?? "",
+      cover_image_url: r.cover_image_url ?? "",
       is_featured: r.is_featured,
       is_active: r.is_active,
     });
     setErrors({});
     setModal("edit");
+  }
+
+  async function uploadCover(file?: File) {
+    if (!file) return;
+    setUploading(true);
+    const body = new FormData();
+    body.append("file", file);
+    body.append("folder", "packages");
+    const response = await fetch("/api/upload", { method: "POST", body });
+    const json = await response.json().catch(() => ({}));
+    setUploading(false);
+    if (!response.ok || !json.data?.url) {
+      showToast(json.error || "Failed to upload package image", "error");
+      return;
+    }
+    setForm((current) => ({ ...current, cover_image_url: json.data.url as string }));
+    showToast("Image uploaded. Save package to publish it.");
   }
 
   async function save() {
@@ -129,10 +156,13 @@ export function PackagesClient() {
       name: form.name.trim(),
       category: form.category,
       tag_line: form.tag_line.trim() || null,
+      description: form.description.trim() || null,
+      detail_text: form.detail_text.trim() || null,
       hotel_distance_m: form.hotel_distance_m ? Number(form.hotel_distance_m) : null,
       flight_type: form.flight_type.trim() || null,
       price_mode: form.price_mode,
       price_display_text: form.price_display_text.trim() || null,
+      cover_image_url: form.cover_image_url.trim() || null,
       is_featured: form.is_featured,
       is_active: form.is_active,
     };
@@ -183,8 +213,9 @@ export function PackagesClient() {
     void load();
   }
 
-  const set = (k: keyof Form) => (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) =>
-    setForm((p) => ({ ...p, [k]: e.target.value }));
+  const set = (k: keyof Form) => (
+    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>
+  ) => setForm((p) => ({ ...p, [k]: e.target.value }));
 
   return (
     <div>
@@ -272,8 +303,40 @@ export function PackagesClient() {
                 {rows.map((r) => (
                   <tr key={r.id}>
                     <td>
-                      <div style={{ fontWeight: 500, fontSize: 13 }}>{r.name}</div>
-                      <div style={{ fontSize: 11, color: "var(--text-muted)" }}>/{r.slug}</div>
+                      <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+                        {r.cover_image_url ? (
+                          // eslint-disable-next-line @next/next/no-img-element
+                          <img
+                            src={r.cover_image_url}
+                            alt=""
+                            width={44}
+                            height={32}
+                            style={{
+                              width: 44,
+                              height: 32,
+                              objectFit: "cover",
+                              borderRadius: 6,
+                              flexShrink: 0,
+                              background: "var(--bg-muted)",
+                            }}
+                          />
+                        ) : (
+                          <span
+                            style={{
+                              width: 44,
+                              height: 32,
+                              borderRadius: 6,
+                              background: "var(--bg-muted)",
+                              flexShrink: 0,
+                            }}
+                            aria-hidden
+                          />
+                        )}
+                        <div>
+                          <div style={{ fontWeight: 500, fontSize: 13 }}>{r.name}</div>
+                          <div style={{ fontSize: 11, color: "var(--text-muted)" }}>/{r.slug}</div>
+                        </div>
+                      </div>
                     </td>
                     <td><Badge color={CAT_COL[r.category] || "gray"}>{r.category}</Badge></td>
                     <td style={{ fontSize: 12 }}>{r.tag_line || "—"}</td>
@@ -304,7 +367,7 @@ export function PackagesClient() {
       </div>
 
       {modal && (
-        <Modal title={modal === "new" ? "Add package" : "Edit package"} onClose={() => setModal(null)} width={560}>
+        <Modal title={modal === "new" ? "Add package" : "Edit package"} onClose={() => setModal(null)} width={640}>
           <div className="admin-grid-2">
             <Field label="Package name" required error={errors.name}>
               <input className="admin-input" value={form.name} onChange={set("name")} />
@@ -325,6 +388,27 @@ export function PackagesClient() {
               <input className="admin-input" value={form.tag_line} onChange={set("tag_line")} />
             </Field>
           </div>
+
+          <Field label="Description" error={errors.description}>
+            <textarea
+              className="admin-textarea"
+              rows={3}
+              value={form.description}
+              onChange={set("description")}
+              placeholder="Short summary shown under the package title"
+            />
+          </Field>
+
+          <Field label="Package details" error={errors.detail_text}>
+            <textarea
+              className="admin-textarea"
+              rows={8}
+              value={form.detail_text}
+              onChange={set("detail_text")}
+              placeholder="Full details: pricing tiers, hotels, include / exclude…"
+            />
+          </Field>
+
           <div className="admin-grid-2">
             <Field label="Hotel dist. (m)" error={errors.hotel_distance_m}>
               <input className="admin-input" type="number" value={form.hotel_distance_m} onChange={set("hotel_distance_m")} />
@@ -344,6 +428,58 @@ export function PackagesClient() {
               <input className="admin-input" value={form.price_display_text} onChange={set("price_display_text")} />
             </Field>
           </div>
+
+          <Field label="Cover image (4:5 thumbnail)" error={errors.cover_image_url}>
+            {form.cover_image_url ? (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img
+                src={form.cover_image_url}
+                alt="Package cover preview"
+                style={{
+                  width: 128,
+                  height: 160,
+                  objectFit: "cover",
+                  borderRadius: 10,
+                  marginBottom: 10,
+                  border: "1px solid var(--border)",
+                  display: "block",
+                }}
+              />
+            ) : null}
+            <input
+              className="admin-input"
+              type="url"
+              value={form.cover_image_url}
+              onChange={set("cover_image_url")}
+              placeholder="https://… or upload below"
+            />
+            <div style={{ display: "flex", gap: 8, marginTop: 8 }}>
+              <label className="admin-btn secondary" style={{ cursor: "pointer", flex: 1 }}>
+                <Upload size={13} />
+                {uploading ? "Uploading…" : "Upload image"}
+                <input
+                  type="file"
+                  accept="image/jpeg,image/png,image/webp"
+                  hidden
+                  disabled={uploading}
+                  onChange={(event) => {
+                    void uploadCover(event.target.files?.[0]);
+                    event.currentTarget.value = "";
+                  }}
+                />
+              </label>
+              <button
+                type="button"
+                className="admin-btn secondary"
+                title="Clear cover image"
+                onClick={() => setForm((p) => ({ ...p, cover_image_url: "" }))}
+              >
+                <RotateCcw size={13} />
+                Clear
+              </button>
+            </div>
+          </Field>
+
           <div style={{ display: "flex", gap: 20, marginBottom: 18 }}>
             <label style={{ display: "flex", alignItems: "center", gap: 7, fontSize: 13, cursor: "pointer" }}>
               <Toggle checked={form.is_featured} onChange={(v) => setForm((p) => ({ ...p, is_featured: v }))} />

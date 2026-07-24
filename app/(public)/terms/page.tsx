@@ -10,7 +10,7 @@ import { resolveHeroAppearance } from "@/lib/hero-settings";
 export const metadata: Metadata = {
   title: "Syarat dan Ketentuan Layanan | SS Umroh",
   description:
-    "Syarat dan Ketentuan penggunaan situs serta layanan perjalanan umroh dan halal tour dari PT. Sarana Sadaya (SS Umroh).",
+    "Syarat dan Ketentuan penggunaan situs serta layanan perjalanan umroh dari PT. Sarana Sadaya (SS Umroh).",
 };
 
 const EFFECTIVE_DATE = "21 Juli 2026";
@@ -41,8 +41,8 @@ const SECTIONS: LegalSection[] = [
     title: "Ruang Lingkup Layanan",
     content: (
       <p>
-        Kami menyediakan konsultasi dan penyelenggaraan perjalanan umroh, halal
-        tour, perjalanan korporat atau grup, serta layanan pendukung seperti
+        Kami menyediakan konsultasi dan penyelenggaraan perjalanan umroh,
+        perjalanan korporat atau grup, serta layanan pendukung seperti
         tiket, hotel, visa, transportasi, asuransi, dan bimbingan perjalanan.
         Rincian fasilitas mengikuti paket atau proposal tertulis yang dipilih.
       </p>

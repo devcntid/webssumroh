@@ -16,7 +16,7 @@ export async function getFeaturedPackages(limit = 3): Promise<Package[]> {
     async () =>
       (await sql`
         SELECT
-          id, slug, name, category, tag_line, description, hotel_distance_m,
+          id, slug, name, category, tag_line, description, detail_text, hotel_distance_m,
           flight_type, price_mode, price_idr, price_display_text, cover_image_url,
           is_featured, is_active, display_order, created_at, updated_at, deleted_at,
           created_by, updated_by
@@ -36,7 +36,7 @@ export async function getActivePackages(): Promise<Package[]> {
     async () =>
       (await sql`
         SELECT
-          id, slug, name, category, tag_line, description, hotel_distance_m,
+          id, slug, name, category, tag_line, description, detail_text, hotel_distance_m,
           flight_type, price_mode, price_idr, price_display_text, cover_image_url,
           is_featured, is_active, display_order, created_at, updated_at, deleted_at,
           created_by, updated_by
@@ -65,7 +65,7 @@ export async function listPackagesAdmin(opts: {
 
   const rows = await sql`
     SELECT
-      id, slug, name, category, tag_line, description, hotel_distance_m,
+      id, slug, name, category, tag_line, description, detail_text, hotel_distance_m,
       flight_type, price_mode, price_idr, price_display_text, cover_image_url,
       is_featured, is_active, display_order, created_at, updated_at, deleted_at,
       created_by, updated_by,
@@ -93,7 +93,7 @@ export async function listPackagesAdmin(opts: {
 export async function getPackageById(id: number): Promise<Package | null> {
   const rows = await sql`
     SELECT
-      id, slug, name, category, tag_line, description, hotel_distance_m,
+      id, slug, name, category, tag_line, description, detail_text, hotel_distance_m,
       flight_type, price_mode, price_idr, price_display_text, cover_image_url,
       is_featured, is_active, display_order, created_at, updated_at, deleted_at,
       created_by, updated_by
@@ -110,6 +110,7 @@ export interface PackageInput {
   category: PackageCategory;
   tag_line?: string | null;
   description?: string | null;
+  detail_text?: string | null;
   hotel_distance_m?: number | null;
   flight_type?: string | null;
   price_mode: PriceMode;
@@ -127,13 +128,13 @@ export async function createPackage(input: PackageInput, userId: number): Promis
   }
   const rows = await sql`
     INSERT INTO packages (
-      slug, name, category, tag_line, description, hotel_distance_m,
+      slug, name, category, tag_line, description, detail_text, hotel_distance_m,
       flight_type, price_mode, price_idr, price_display_text, cover_image_url,
       is_featured, is_active, display_order, created_by, updated_by
     )
     VALUES (
       ${input.slug}, ${input.name}, ${input.category},
-      ${input.tag_line ?? null}, ${input.description ?? null},
+      ${input.tag_line ?? null}, ${input.description ?? null}, ${input.detail_text ?? null},
       ${input.hotel_distance_m ?? null}, ${input.flight_type ?? "Direct ✈"},
       ${input.price_mode}, ${input.price_idr ?? null},
       ${input.price_display_text ?? null}, ${input.cover_image_url ?? null},
@@ -141,7 +142,7 @@ export async function createPackage(input: PackageInput, userId: number): Promis
       ${input.display_order ?? 0}, ${userId}, ${userId}
     )
     RETURNING
-      id, slug, name, category, tag_line, description, hotel_distance_m,
+      id, slug, name, category, tag_line, description, detail_text, hotel_distance_m,
       flight_type, price_mode, price_idr, price_display_text, cover_image_url,
       is_featured, is_active, display_order, created_at, updated_at, deleted_at,
       created_by, updated_by
@@ -167,6 +168,7 @@ export async function updatePackage(
       category = ${input.category},
       tag_line = ${input.tag_line ?? null},
       description = ${input.description ?? null},
+      detail_text = ${input.detail_text ?? null},
       hotel_distance_m = ${input.hotel_distance_m ?? null},
       flight_type = ${input.flight_type ?? "Direct ✈"},
       price_mode = ${input.price_mode},
@@ -180,7 +182,7 @@ export async function updatePackage(
       updated_at = NOW()
     WHERE id = ${id} AND deleted_at IS NULL
     RETURNING
-      id, slug, name, category, tag_line, description, hotel_distance_m,
+      id, slug, name, category, tag_line, description, detail_text, hotel_distance_m,
       flight_type, price_mode, price_idr, price_display_text, cover_image_url,
       is_featured, is_active, display_order, created_at, updated_at, deleted_at,
       created_by, updated_by
@@ -232,7 +234,7 @@ export async function togglePackageField(
       UPDATE packages SET is_featured = ${value}, updated_by = ${userId}, updated_at = NOW()
       WHERE id = ${id} AND deleted_at IS NULL
       RETURNING
-        id, slug, name, category, tag_line, description, hotel_distance_m,
+        id, slug, name, category, tag_line, description, detail_text, hotel_distance_m,
         flight_type, price_mode, price_idr, price_display_text, cover_image_url,
         is_featured, is_active, display_order, created_at, updated_at, deleted_at,
         created_by, updated_by
@@ -243,7 +245,7 @@ export async function togglePackageField(
     UPDATE packages SET is_active = ${value}, updated_by = ${userId}, updated_at = NOW()
     WHERE id = ${id} AND deleted_at IS NULL
     RETURNING
-      id, slug, name, category, tag_line, description, hotel_distance_m,
+      id, slug, name, category, tag_line, description, detail_text, hotel_distance_m,
       flight_type, price_mode, price_idr, price_display_text, cover_image_url,
       is_featured, is_active, display_order, created_at, updated_at, deleted_at,
       created_by, updated_by

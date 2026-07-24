@@ -192,7 +192,7 @@ export function GalleryClient() {
       </div>
 
       <div className="admin-filter-tabs">
-        {["all", "umroh", "halal-tour", "korporat", "general"].map((c) => (
+        {["all", "umroh", "korporat", "general"].map((c) => (
           <button
             key={c}
             type="button"
@@ -278,7 +278,7 @@ export function GalleryClient() {
           </Field>
           <Field label="Category" error={errors.category}>
             <select className="admin-select" value={form.category} onChange={set("category")}>
-              {["umroh", "halal-tour", "korporat", "general"].map((c) => (
+              {["umroh", "korporat", "general"].map((c) => (
                 <option key={c} value={c}>{c}</option>
               ))}
             </select>

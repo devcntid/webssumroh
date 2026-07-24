@@ -15,7 +15,6 @@ export type Department = "Operations" | "Marketing" | "Customer Service" | "Fina
 export type HeroPageKey =
   | "home"
   | "paket-umroh"
-  | "halal-tour"
   | "korporat"
   | "destinasi"
   | "tentang-kami"
@@ -45,6 +44,10 @@ export interface SiteSetting {
   cs_name: string;
   ppiu_license: string;
   maps_embed_url: string | null;
+  /** Color brand logo for scrolled header + footer. Null = default. */
+  logo_url: string | null;
+  /** White brand logo for unscrolled header. Null = default. */
+  logo_white_url: string | null;
   hero_settings: HeroSettings;
   updated_at: string;
   updated_by: number | null;
@@ -85,7 +88,10 @@ export interface Package {
   name: string;
   category: PackageCategory;
   tag_line: string | null;
+  /** Short summary shown under the package title. */
   description: string | null;
+  /** Long details (pricing, hotels, include/exclude). */
+  detail_text: string | null;
   hotel_distance_m: number | null;
   flight_type: string | null;
   price_mode: PriceMode;

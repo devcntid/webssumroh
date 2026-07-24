@@ -34,7 +34,6 @@ const TOPICS = [
   "Paket Umroh Bintang 4",
   "Tabungan Umroh",
   "Umroh Korporat / Group",
-  "Halal Tour",
   "Jadwal Keberangkatan",
   "Lainnya",
 ];

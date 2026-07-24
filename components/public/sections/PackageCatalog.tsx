@@ -1,14 +1,15 @@
 "use client";
 
-import { useState } from "react";
-import { MapPin, MessageCircle, Plane } from "lucide-react";
+import { useEffect, useState } from "react";
+import Image from "next/image";
+import { MapPin, MessageCircle, Plane, X, ZoomIn } from "lucide-react";
 import type { Package, PackageCategory } from "@/types/db";
 
 /**
  * PackageCatalog — Client Component
  * Data source: lib/queries/packages.ts → getActivePackages()
  * CMS: /panel/packages
- * Client-rendered only for category filtering; package data is SSR-provided.
+ * Client-rendered for category filtering + thumbnail lightbox.
  */
 
 interface PackageCatalogProps {
@@ -32,10 +33,24 @@ export function PackageCatalog({
   whatsappNumber,
 }: PackageCatalogProps) {
   const [filter, setFilter] = useState<FilterValue>("all");
+  const [zoom, setZoom] = useState<{ src: string; alt: string } | null>(null);
   const visiblePackages =
     filter === "all"
       ? packages
       : packages.filter((pkg) => pkg.category === filter);
+
+  useEffect(() => {
+    if (!zoom) return;
+    const onKey = (event: KeyboardEvent) => {
+      if (event.key === "Escape") setZoom(null);
+    };
+    document.body.style.overflow = "hidden";
+    window.addEventListener("keydown", onKey);
+    return () => {
+      document.body.style.overflow = "";
+      window.removeEventListener("keydown", onKey);
+    };
+  }, [zoom]);
 
   return (
     <>
@@ -75,14 +90,45 @@ export function PackageCatalog({
                   {pkg.is_featured && (
                     <span className="package-list-featured">Paling Populer</span>
                   )}
-                  <div className="k-icon" aria-hidden>
-                    <Plane size={24} />
-                  </div>
+                  {pkg.cover_image_url ? (
+                    <button
+                      type="button"
+                      className="package-list-cover package-list-cover--zoom"
+                      onClick={() =>
+                        setZoom({ src: pkg.cover_image_url!, alt: pkg.name })
+                      }
+                      aria-label={`Perbesar gambar ${pkg.name}`}
+                    >
+                      <Image
+                        src={pkg.cover_image_url}
+                        alt={pkg.name}
+                        width={640}
+                        height={800}
+                        sizes="(max-width: 768px) 100vw, 33vw"
+                      />
+                      <span className="package-list-zoom-hint" aria-hidden>
+                        <ZoomIn size={16} />
+                      </span>
+                    </button>
+                  ) : (
+                    <div className="package-list-cover package-list-cover--empty" aria-hidden>
+                      <Plane size={28} />
+                    </div>
+                  )}
                   {pkg.tag_line && <span className="k-tag">{pkg.tag_line}</span>}
                   <h2 className="package-list-name">{pkg.name}</h2>
                   <p className="package-list-description">
-                    {pkg.description || "Paket umroh dengan fasilitas lengkap dan pendampingan ibadah."}
+                    {pkg.description ||
+                      "Paket umroh dengan fasilitas lengkap dan pendampingan ibadah."}
                   </p>
+                  {pkg.detail_text && (
+                    <details className="package-list-details">
+                      <summary>Lihat detail paket</summary>
+                      <p className="package-list-description package-list-description--full">
+                        {pkg.detail_text}
+                      </p>
+                    </details>
+                  )}
 
                   <div className="package-list-meta">
                     {pkg.hotel_distance_m && (
@@ -97,7 +143,12 @@ export function PackageCatalog({
 
                   <div className="package-list-price">
                     <span>Harga mulai</span>
-                    <strong>{pkg.price_display_text || "Hubungi CS Kami"}</strong>
+                    <strong>
+                      {pkg.price_display_text ||
+                        (pkg.price_idr
+                          ? `Rp ${pkg.price_idr.toLocaleString("id-ID")}`
+                          : "Hubungi CS Kami")}
+                    </strong>
                   </div>
 
                   <a
@@ -118,6 +169,32 @@ export function PackageCatalog({
           )}
         </div>
       </section>
+
+      {zoom && (
+        <div
+          className="package-lightbox"
+          role="dialog"
+          aria-modal="true"
+          aria-label={zoom.alt}
+          onClick={() => setZoom(null)}
+        >
+          <button
+            type="button"
+            className="package-lightbox-close"
+            aria-label="Tutup"
+            onClick={() => setZoom(null)}
+          >
+            <X size={20} />
+          </button>
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src={zoom.src}
+            alt={zoom.alt}
+            className="package-lightbox-img"
+            onClick={(event) => event.stopPropagation()}
+          />
+        </div>
+      )}
     </>
   );
 }

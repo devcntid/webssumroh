@@ -12,6 +12,14 @@ const nextConfig: NextConfig = {
       { protocol: "https", hostname: "hamisbooking.com" },
     ],
   },
+  async redirects() {
+    return [
+      { source: "/halal-tour", destination: "/", permanent: true },
+      { source: "/halal-tour/:path*", destination: "/", permanent: true },
+      { source: "/wisata-halal", destination: "/", permanent: true },
+      { source: "/wisata-halal/:path*", destination: "/", permanent: true },
+    ];
+  },
   serverExternalPackages: ["@neondatabase/serverless"],
 };
 

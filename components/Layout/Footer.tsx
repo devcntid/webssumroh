@@ -1,25 +1,29 @@
 import Link from "next/link";
-import { MapPin, Phone, Mail } from "lucide-react";
+import { MapPin, Phone } from "lucide-react";
 import { FaFacebook, FaInstagram, FaYoutube } from "react-icons/fa";
+import { DEFAULT_LOGO_COLOR_URL } from "@/lib/brand";
 
 interface FooterProps {
   settings: {
     office_address: string;
     phone_display: string;
     ppiu_license: string;
+    /** Color logo for footer and non-header sections. */
+    logo_url?: string;
   };
 }
 
-const LOGO = "https://ssumroh.id/wp-content/uploads/2023/01/Logo-Putih.png";
-
 export function Footer({ settings }: FooterProps) {
+  const logoUrl = settings.logo_url || DEFAULT_LOGO_COLOR_URL;
+
   return (
     <footer>
       <div className="container">
         <div className="footer-g">
           <div>
             <Link href="/" className="f-logo">
-              <img src={LOGO} alt="SS Umroh Logo" />
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img src={logoUrl} alt="SS Umroh Logo" />
             </Link>
             <p className="f-desc">
               PT. Sarana Sadaya (SS Umroh) adalah biro perjalanan ibadah umroh dan haji khusus resmi berizin Kemenag RI. Kami berkomitmen memberikan pelayanan terbaik untuk kelancaran ibadah Anda.
@@ -33,12 +37,11 @@ export function Footer({ settings }: FooterProps) {
               <span>{settings.phone_display}</span>
             </div>
           </div>
-          
+
           <div>
             <h4 className="f-col-t">Layanan</h4>
             <Link href="/paket-umroh" className="f-link">Umroh Reguler</Link>
             <Link href="/paket-umroh" className="f-link">Umroh Plus</Link>
-            <Link href="/halal-tour" className="f-link">Halal Tour</Link>
             <Link href="/korporat" className="f-link">Corporate Travel</Link>
           </div>
 

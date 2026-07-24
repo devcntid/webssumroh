@@ -31,58 +31,6 @@ import {
 const USTADZ_IMG =
   "https://images.unsplash.com/photo-1573483883644-d0b4b55eb25d?auto=format&fit=crop&w=760&h=950&q=80";
 
-/** Wisata halal cards — editorial content with free Unsplash imagery. */
-const HALAL_TOURS = [
-  {
-    name: "Wisata Halal Turki",
-    subtitle: "10 Hari 7 Malam",
-    image:
-      "https://images.unsplash.com/photo-1541432901042-2d8bd64b4a9b?auto=format&fit=crop&w=640&h=400&q=80",
-    imageAlt: "Masjid Biru (Sultan Ahmed) di Istanbul, Turki",
-    features: [
-      ["🌟", "Hotel Bintang 4 Grade A"],
-      ["🍽️", "Makanan halal sepanjang tour"],
-      ["🕌", "Waktu sholat terjaga"],
-    ],
-    priceLabel: "Mulai",
-    price: "IDR 15.500.000",
-    priceNote: "(quad)",
-    cta: "Lihat Paket Turki",
-  },
-  {
-    name: "Labuan Bajo Halal",
-    subtitle: "4 Hari 3 Malam",
-    image:
-      "https://images.unsplash.com/photo-1535779023901-a39d15762564?auto=format&fit=crop&w=640&h=400&q=80",
-    imageAlt: "Pemandangan udara pulau di Labuan Bajo, Nusa Tenggara Timur",
-    features: [
-      ["⛵", "Live on board Vinca Phinisi"],
-      ["🤿", "Snorkeling Komodo & Padar"],
-      ["👥", "Min. 11 orang (group)"],
-    ],
-    priceLabel: "DP",
-    price: "Rp 10.000.000",
-    priceNote: "/orang",
-    cta: "Lihat Paket Labuan Bajo",
-  },
-  {
-    name: "Bali + Nusa Penida",
-    subtitle: "Domestic Halal Tour",
-    image:
-      "https://images.unsplash.com/photo-1537996194471-e657df975ab4?auto=format&fit=crop&w=640&h=400&q=80",
-    imageAlt: "Pura Ulun Danu Bratan di Bali",
-    features: [
-      ["🍽️", "Makanan halal sepanjang tour"],
-      ["🕌", "Waktu sholat terjaga"],
-      ["📍", "Nusa Penida termasuk"],
-    ],
-    priceLabel: "DP",
-    price: "Rp 10.000.000",
-    priceNote: "/orang",
-    cta: "Lihat Paket Bali",
-  },
-];
-
 const HERO_BG =
   "https://images.unsplash.com/photo-1591604129939-f1efa4d9f7fa?auto=format&fit=crop&w=1920&q=85";
 
@@ -327,62 +275,7 @@ export default async function HomePage() {
         </div>
       </section>
 
-      {/* 7. Wisata Halal */}
-      <section className="home-section home-section--white" aria-label="Wisata halal">
-        <div className="container">
-          <div className="section-header center">
-            <span className="section-label">Wisata Halal</span>
-            <h2 className="section-title">Liburan Bermakna, Bernuansa Islami</h2>
-            <p className="section-sub">
-              Eksplorasi destinasi terbaik tanpa khawatir soal makanan halal dan
-              waktu sholat.
-            </p>
-          </div>
-
-          <div className="halal-grid">
-            {HALAL_TOURS.map((tour) => (
-              <article key={tour.name} className="halal-card" aria-label={tour.name}>
-                <div className="halal-card-img">
-                  <Image
-                    src={tour.image}
-                    alt={tour.imageAlt}
-                    width={640}
-                    height={400}
-                    sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 370px"
-                  />
-                </div>
-                <div className="halal-card-body">
-                  <h3 className="halal-card-name">{tour.name}</h3>
-                  <p className="halal-card-sub">{tour.subtitle}</p>
-                  <ul className="halal-feats">
-                    {tour.features.map(([emoji, text]) => (
-                      <li key={text}>
-                        <span aria-hidden>{emoji}</span>
-                        {text}
-                      </li>
-                    ))}
-                  </ul>
-                  <p className="halal-price">
-                    {tour.priceLabel} <strong>{tour.price}</strong>
-                    <span className="halal-price-note">{tour.priceNote}</span>
-                  </p>
-                  <Link href="/wisata-halal" className="halal-cta">
-                    {tour.cta} →
-                  </Link>
-                </div>
-              </article>
-            ))}
-          </div>
-
-          <div className="section-footer">
-            <Link href="/wisata-halal" className="pkg-more-link">
-              Lihat semua destinasi halal tour →
-            </Link>
-          </div>
-        </div>
-      </section>
-
-      {/* 8. FAQ */}
+      {/* FAQ */}
       <section className="faq-section home-section" aria-label="FAQ umroh">
         <div className="container faq-inner">
           <div className="faq-side">

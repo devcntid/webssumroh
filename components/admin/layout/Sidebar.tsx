@@ -4,7 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { signOut } from "next-auth/react";
 import {
-  LayoutDashboard, Settings, Package, Calendar, Globe, Map, Star,
+  LayoutDashboard, Settings, Package, Calendar, Star,
   HelpCircle, Image, Users, Mail, Building2, UserCog, ClipboardList,
   ChevronRight, LogOut,
 } from "lucide-react";
@@ -17,8 +17,6 @@ const ICONS: Record<string, React.ComponentType<{ size?: number }>> = {
   settings: Settings,
   packages: Package,
   schedules: Calendar,
-  "halal-dest": Globe,
-  "halal-pkgs": Map,
   testimonials: Star,
   faqs: HelpCircle,
   gallery: Image,

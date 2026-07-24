@@ -65,6 +65,10 @@ CREATE TABLE site_settings (
     cs_name             VARCHAR(100) NOT NULL DEFAULT 'Bayu Muharram',
     ppiu_license        VARCHAR(100) NOT NULL DEFAULT 'SK PPIU No. U.108 Tahun 2021',
     maps_embed_url      TEXT,
+    -- Color brand logo (scrolled header, footer). NULL = default
+    logo_url            TEXT,
+    -- White brand logo (unscrolled header). NULL = default Logo-Putih.png
+    logo_white_url      TEXT,
     -- Per-page public hero image URL and background color, keyed by route name
     hero_settings       JSONB        NOT NULL DEFAULT '{}'::jsonb,
     updated_at          TIMESTAMPTZ  NOT NULL DEFAULT NOW(),
@@ -132,7 +136,8 @@ CREATE TABLE packages (
     category            VARCHAR(30)  NOT NULL
                             CHECK (category IN ('hemat','bintang4','tabungan','ramadhan','group')),
     tag_line            VARCHAR(60),
-    description         TEXT,
+    description         TEXT,                 -- short card summary under title
+    detail_text         TEXT,                 -- long package details (pricing, hotels, include)
     hotel_distance_m    SMALLINT     CHECK (hotel_distance_m BETWEEN 0 AND 5000),
     flight_type         VARCHAR(60)  DEFAULT 'Direct ✈',
     price_mode          VARCHAR(20)  NOT NULL DEFAULT 'contact'

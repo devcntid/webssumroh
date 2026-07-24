@@ -16,7 +16,6 @@ export const HERO_PAGES: ReadonlyArray<{
 }> = [
   { key: "home", label: "Home", route: "/", supportsVideo: true },
   { key: "paket-umroh", label: "Umroh", route: "/paket-umroh" },
-  { key: "halal-tour", label: "Halal Tour", route: "/halal-tour" },
   { key: "korporat", label: "Korporat", route: "/korporat" },
   { key: "destinasi", label: "Destinasi", route: "/destinasi" },
   { key: "tentang-kami", label: "Tentang Kami", route: "/tentang-kami" },

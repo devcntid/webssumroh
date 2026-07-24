@@ -7,7 +7,6 @@ import {
   createPackage,
   listPackagesAdmin,
 } from "@/lib/queries/packages";
-import { sanitizeHtml } from "@/lib/sanitize";
 
 const CONTENT_ROLES = ["super_admin", "admin", "editor"] as const;
 
@@ -17,6 +16,7 @@ const CreatePackageSchema = z.object({
   category: z.enum(["hemat", "bintang4", "tabungan", "ramadhan", "group"]),
   tag_line: z.string().max(300).nullable().optional(),
   description: z.string().nullable().optional(),
+  detail_text: z.string().nullable().optional(),
   hotel_distance_m: z.number().int().nullable().optional(),
   flight_type: z.string().max(100).nullable().optional(),
   price_mode: z.enum(["contact", "number"]),
@@ -98,7 +98,8 @@ export async function POST(req: NextRequest) {
       {
         ...data,
         slug,
-        description: data.description ? sanitizeHtml(data.description) : data.description,
+        description: data.description?.trim() || null,
+        detail_text: data.detail_text?.trim() || null,
       },
       session.userId
     );

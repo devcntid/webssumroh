@@ -24,7 +24,7 @@ import {
 export const metadata: Metadata = {
   title: "Kontak & Lokasi | SS Umroh",
   description:
-    "Hubungi SS Umroh untuk konsultasi gratis paket umroh, halal tour, dan perjalanan korporat. WhatsApp, telepon, atau kunjungi kantor kami di Bandung.",
+    "Hubungi SS Umroh untuk konsultasi gratis paket umroh dan perjalanan korporat. WhatsApp, telepon, atau kunjungi kantor kami di Bandung.",
 };
 
 const HERO_IMAGE =

@@ -24,6 +24,10 @@ export const siteSettings = pgTable("site_settings", {
   cs_name: varchar("cs_name", { length: 100 }).notNull().default("Bayu Muharram"),
   ppiu_license: varchar("ppiu_license", { length: 100 }).notNull().default("SK PPIU No. U.108 Tahun 2021"),
   maps_embed_url: text("maps_embed_url"),
+  /** Color brand logo (scrolled header, footer). Null = default. */
+  logo_url: text("logo_url"),
+  /** White brand logo (unscrolled dark/transparent header). Null = default. */
+  logo_white_url: text("logo_white_url"),
   hero_settings: jsonb("hero_settings")
     .$type<Record<string, { image_url: string | null; background_color: string }>>()
     .notNull()
@@ -75,6 +79,8 @@ export const packages = pgTable("packages", {
   category: varchar("category", { length: 30 }).notNull(),
   tag_line: varchar("tag_line", { length: 60 }),
   description: text("description"),
+  /** Long package details (pricing tiers, hotels, include/exclude). */
+  detail_text: text("detail_text"),
   hotel_distance_m: smallint("hotel_distance_m"),
   flight_type: varchar("flight_type", { length: 60 }).default("Direct ✈"),
   price_mode: varchar("price_mode", { length: 20 }).notNull().default("contact"),

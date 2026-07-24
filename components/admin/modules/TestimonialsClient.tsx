@@ -198,7 +198,7 @@ export function TestimonialsClient() {
       </div>
 
       <div className="admin-filter-tabs">
-        {["all", "general", "halal-tour", "korporat"].map((c) => (
+        {["all", "general", "korporat"].map((c) => (
           <button
             key={c}
             type="button"
@@ -313,7 +313,7 @@ export function TestimonialsClient() {
           <div className="admin-grid-2">
             <Field label="Context" error={errors.page_context}>
               <select className="admin-select" value={form.page_context} onChange={set("page_context")}>
-                {["general", "halal-tour", "korporat"].map((c) => (
+                {["general", "korporat"].map((c) => (
                   <option key={c} value={c}>{c}</option>
                 ))}
               </select>

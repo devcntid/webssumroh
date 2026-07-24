@@ -178,7 +178,7 @@ export function FaqsClient() {
       </div>
 
       <div className="admin-filter-tabs">
-        {["all", "general", "halal-tour", "korporat"].map((c) => (
+        {["all", "general", "korporat"].map((c) => (
           <button
             key={c}
             type="button"
@@ -252,7 +252,7 @@ export function FaqsClient() {
         <Modal title={modal === "new" ? "Add FAQ" : "Edit FAQ"} onClose={() => setModal(null)} width={560}>
           <Field label="Category" error={errors.category}>
             <select className="admin-select" value={form.category} onChange={set("category")}>
-              {["general", "halal-tour", "korporat"].map((c) => (
+              {["general", "korporat"].map((c) => (
                 <option key={c} value={c}>{c}</option>
               ))}
             </select>

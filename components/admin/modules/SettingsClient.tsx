@@ -7,6 +7,7 @@ import { Field } from "@/components/admin/ui/Field";
 import { Btn } from "@/components/admin/ui/Btn";
 import { useToast } from "@/components/admin/ui/Toast";
 import { fetchJson, issuesToFieldErrors } from "@/components/admin/lib/fetch-json";
+import { DEFAULT_LOGO_COLOR_URL, DEFAULT_LOGO_WHITE_URL } from "@/lib/brand";
 import {
   DEFAULT_HERO_COLOR,
   HERO_PAGES,
@@ -21,6 +22,8 @@ type Form = {
   cs_name: string;
   ppiu_license: string;
   maps_embed_url: string;
+  logo_url: string;
+  logo_white_url: string;
   hero_settings: Record<HeroPageKey, HeroAppearance>;
 };
 
@@ -31,6 +34,8 @@ const EMPTY: Form = {
   cs_name: "",
   ppiu_license: "",
   maps_embed_url: "",
+  logo_url: "",
+  logo_white_url: "",
   hero_settings: normalizeHeroSettings(),
 };
 
@@ -48,6 +53,7 @@ export function SettingsClient() {
   const [saving, setSaving] = useState(false);
   const [uploadingPage, setUploadingPage] = useState<HeroPageKey | null>(null);
   const [uploadingVideoPage, setUploadingVideoPage] = useState<HeroPageKey | null>(null);
+  const [uploadingLogo, setUploadingLogo] = useState<"color" | "white" | null>(null);
   const [activeColorPicker, setActiveColorPicker] = useState<HeroPageKey | null>(null);
 
   const load = useCallback(async () => {
@@ -66,6 +72,8 @@ export function SettingsClient() {
       cs_name: d.cs_name ?? "",
       ppiu_license: d.ppiu_license ?? "",
       maps_embed_url: d.maps_embed_url ?? "",
+      logo_url: d.logo_url ?? "",
+      logo_white_url: d.logo_white_url ?? "",
       hero_settings: normalizeHeroSettings(d.hero_settings),
     });
     setLoading(false);
@@ -82,6 +90,8 @@ export function SettingsClient() {
     const body = {
       ...form,
       maps_embed_url: form.maps_embed_url.trim() || null,
+      logo_url: form.logo_url.trim() || null,
+      logo_white_url: form.logo_white_url.trim() || null,
     };
     const { ok, json } = await fetchJson(`/api/site-settings`, {
       method: "PUT",
@@ -124,6 +134,28 @@ export function SettingsClient() {
     }
     setHero(page, { image_url: json.data.url });
     showToast("Hero image uploaded. Save settings to publish it.");
+  }
+
+  async function uploadLogo(variant: "color" | "white", file?: File) {
+    if (!file) return;
+    setUploadingLogo(variant);
+    const body = new FormData();
+    body.append("file", file);
+    body.append("folder", variant === "white" ? "brand/white" : "brand/color");
+    const response = await fetch("/api/upload", { method: "POST", body });
+    const json = await response.json().catch(() => ({}));
+    setUploadingLogo(null);
+    if (!response.ok || !json.data?.url) {
+      showToast(json.error || "Failed to upload logo", "error");
+      return;
+    }
+    const field = variant === "white" ? "logo_white_url" : "logo_url";
+    setForm((current) => ({ ...current, [field]: json.data.url as string }));
+    showToast(
+      variant === "white"
+        ? "White logo uploaded. Save settings to publish it."
+        : "Color logo uploaded. Save settings to publish it."
+    );
   }
 
   async function uploadHeroVideo(page: HeroPageKey, file?: File) {
@@ -177,6 +209,136 @@ export function SettingsClient() {
         <Field label="Maps embed URL" error={errors.maps_embed_url}>
           <input className="admin-input" value={form.maps_embed_url} onChange={set("maps_embed_url")} placeholder="https://…" />
         </Field>
+      </div>
+
+      <div className="admin-card" style={{ maxWidth: 760, marginBottom: 20 }}>
+        <h3 style={{ margin: "0 0 8px", fontSize: 15 }}>Site logos</h3>
+        <p style={{ margin: "0 0 16px", fontSize: 12, color: "var(--text-secondary)" }}>
+          Upload two versions: a white logo for the transparent header (before scroll),
+          and a color logo for the white scrolled header and footer.
+        </p>
+
+        <div
+          style={{
+            display: "grid",
+            gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))",
+            gap: 16,
+          }}
+        >
+          <div>
+            <div
+              style={{
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                minHeight: 88,
+                marginBottom: 12,
+                borderRadius: 12,
+                background: "linear-gradient(135deg, #1a0533, #2d0a5c)",
+                border: "1px solid var(--border)",
+                padding: 16,
+              }}
+            >
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src={form.logo_white_url.trim() || DEFAULT_LOGO_WHITE_URL}
+                alt="White logo preview"
+                style={{ maxHeight: 44, maxWidth: "100%", objectFit: "contain" }}
+              />
+            </div>
+            <Field label="White logo (header before scroll)" error={errors.logo_white_url}>
+              <input
+                className="admin-input"
+                type="url"
+                value={form.logo_white_url}
+                onChange={set("logo_white_url")}
+                placeholder="https://… or upload below"
+              />
+            </Field>
+            <div style={{ display: "flex", gap: 8 }}>
+              <label className="admin-btn secondary" style={{ cursor: "pointer", flex: 1 }}>
+                <Upload size={13} />
+                {uploadingLogo === "white" ? "Uploading…" : "Upload white"}
+                <input
+                  type="file"
+                  accept="image/jpeg,image/png,image/webp"
+                  hidden
+                  disabled={uploadingLogo != null}
+                  onChange={(event) => {
+                    void uploadLogo("white", event.target.files?.[0]);
+                    event.currentTarget.value = "";
+                  }}
+                />
+              </label>
+              <button
+                type="button"
+                className="admin-btn secondary"
+                title="Restore default white logo"
+                onClick={() => setForm((p) => ({ ...p, logo_white_url: "" }))}
+              >
+                <RotateCcw size={13} />
+                Default
+              </button>
+            </div>
+          </div>
+
+          <div>
+            <div
+              style={{
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                minHeight: 88,
+                marginBottom: 12,
+                borderRadius: 12,
+                background: "#f8f7fa",
+                border: "1px solid var(--border)",
+                padding: 16,
+              }}
+            >
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src={form.logo_url.trim() || DEFAULT_LOGO_COLOR_URL}
+                alt="Color logo preview"
+                style={{ maxHeight: 44, maxWidth: "100%", objectFit: "contain" }}
+              />
+            </div>
+            <Field label="Color logo (scrolled header + footer)" error={errors.logo_url}>
+              <input
+                className="admin-input"
+                type="url"
+                value={form.logo_url}
+                onChange={set("logo_url")}
+                placeholder="https://… or upload below"
+              />
+            </Field>
+            <div style={{ display: "flex", gap: 8 }}>
+              <label className="admin-btn secondary" style={{ cursor: "pointer", flex: 1 }}>
+                <Upload size={13} />
+                {uploadingLogo === "color" ? "Uploading…" : "Upload color"}
+                <input
+                  type="file"
+                  accept="image/jpeg,image/png,image/webp"
+                  hidden
+                  disabled={uploadingLogo != null}
+                  onChange={(event) => {
+                    void uploadLogo("color", event.target.files?.[0]);
+                    event.currentTarget.value = "";
+                  }}
+                />
+              </label>
+              <button
+                type="button"
+                className="admin-btn secondary"
+                title="Restore default color logo"
+                onClick={() => setForm((p) => ({ ...p, logo_url: "" }))}
+              >
+                <RotateCcw size={13} />
+                Default
+              </button>
+            </div>
+          </div>
+        </div>
       </div>
 
       <div className="admin-card">
