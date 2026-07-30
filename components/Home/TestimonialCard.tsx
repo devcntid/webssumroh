@@ -3,7 +3,7 @@ import { Star } from "lucide-react";
 
 export function TestimonialCard({ t }: { t: Testimonial }) {
   return (
-    <div className="t-card">
+    <div className="t-card" role="listitem">
       <div className="flex gap-1 text-[#D4A017]">
         {Array.from({ length: t.star_rating }).map((_, i) => (
           <Star key={i} size={14} fill="currentColor" />

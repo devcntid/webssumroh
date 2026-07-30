@@ -540,14 +540,50 @@ footer{background:var(--p9);border-top:1px solid rgba(255,255,255,.05);padding:c
   .ph-sub{font-size:14px;max-width:100%}
   .ph-badges,.ph-chips{gap:8px}
   .badge-hero{font-size:11px;padding:7px 11px}
-  .t-grid,.home-card-grid,.home-feature-grid,.pkg-grid{grid-template-columns:1fr}
+  .home-card-grid,.pkg-grid{grid-template-columns:1fr}
+  .home-feature-grid,
+  .t-grid,
+  .corporate-service-grid,
+  .corporate-industry-grid,
+  .corporate-process{
+    display:flex;
+    gap:14px;
+    overflow-x:auto;
+    overflow-y:hidden;
+    scroll-snap-type:x mandatory;
+    -webkit-overflow-scrolling:touch;
+    overscroll-behavior-x:contain;
+    scrollbar-width:none;
+    margin-inline:calc(clamp(16px,4vw,24px) * -1);
+    padding-inline:clamp(16px,4vw,24px);
+    padding-bottom:6px;
+  }
+  .home-feature-grid::-webkit-scrollbar,
+  .t-grid::-webkit-scrollbar,
+  .corporate-service-grid::-webkit-scrollbar,
+  .corporate-industry-grid::-webkit-scrollbar,
+  .corporate-process::-webkit-scrollbar{display:none}
+  .home-feature-grid > .k-card,
+  .t-grid > .t-card,
+  .corporate-service-grid > .k-card,
+  .corporate-industry-grid > .corporate-industry-card,
+  .corporate-process > li{
+    flex:0 0 min(78vw,280px);
+    width:min(78vw,280px);
+    scroll-snap-align:start;
+    scroll-snap-stop:always;
+  }
+  .home-feature-grid > .home-empty,
+  .t-grid > .home-empty{
+    flex:0 0 100%;
+    width:100%;
+  }
   .package-page-grid,.package-hotel-grid{grid-template-columns:1fr}
   .package-filter-bar{top:58px}
   .destination-grid{grid-template-columns:1fr}
   .destination-tabs{top:58px}
   .about-company-details>div{align-items:flex-start}
-  .corporate-service-grid,.corporate-industry-grid,.corporate-process{grid-template-columns:1fr}
-  .corporate-process{gap:32px}
+  .corporate-process::before{display:none}
   .footer-g{grid-template-columns:1fr}
   .ph-ctas,.cta-btns{flex-direction:column;align-items:stretch}
   .btn-primary,.btn-outline{justify-content:center;width:100%}

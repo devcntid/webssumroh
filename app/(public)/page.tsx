@@ -226,7 +226,7 @@ export default async function HomePage() {
             <h2 className="section-title">Mengapa Memilih SS Umroh?</h2>
           </div>
 
-          <div className="home-feature-grid">
+          <div className="home-feature-grid" role="list" aria-label="Daftar keunggulan">
             {[
               [ShieldCheck, "Resmi & Amanah", "Terdaftar resmi sebagai PPIU Kemenag RI. Kami menjaga amanah jamaah 100%."],
               [PlaneTakeoff, "Penerbangan Direct", "Mengutamakan penerbangan langsung tanpa transit untuk kenyamanan maksimal."],
@@ -237,7 +237,7 @@ export default async function HomePage() {
             ].map(([Icon, title, body]) => {
               const I = Icon as typeof ShieldCheck;
               return (
-                <div key={title as string} className="k-card k-card--center">
+                <div key={title as string} className="k-card k-card--center" role="listitem">
                   <div className="k-icon"><I size={26} /></div>
                   <h3 className="k-title">{title as string}</h3>
                   <p className="k-body">{body as string}</p>
@@ -256,7 +256,7 @@ export default async function HomePage() {
             <h2 className="section-title section-title--light">Apa Kata Jamaah Kami?</h2>
           </div>
 
-          <div className="t-grid">
+          <div className="t-grid" role="list" aria-label="Daftar testimoni">
             {testimonials.map((t) => (
               <TestimonialCard key={t.id} t={t} />
             ))}

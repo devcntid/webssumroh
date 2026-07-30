@@ -20,7 +20,7 @@ const nextConfig: NextConfig = {
       { source: "/wisata-halal/:path*", destination: "/", permanent: true },
     ];
   },
-  serverExternalPackages: ["@neondatabase/serverless"],
+  serverExternalPackages: ["@neondatabase/serverless", "sharp"],
 };
 
 export default nextConfig;

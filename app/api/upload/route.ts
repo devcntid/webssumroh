@@ -46,7 +46,7 @@ export async function POST(req: NextRequest) {
     if (e instanceof Error) {
       if (e.message === "UNSUPPORTED_FILE_TYPE") {
         return NextResponse.json(
-          { error: "Unsupported file type. Use JPEG, PNG, WebP, MP4, or WebM." },
+          { error: "Unsupported file type. Use JPEG, PNG, WebP, GIF, MP4, or WebM." },
           { status: 422 }
         );
       }
@@ -58,7 +58,13 @@ export async function POST(req: NextRequest) {
       }
       if (e.message === "FILE_TOO_LARGE") {
         return NextResponse.json(
-          { error: "Image too large. Maximum size is 8MB." },
+          { error: "Image too large. Maximum upload size is 8MB (compressed to WebP ≤ 200KB)." },
+          { status: 422 }
+        );
+      }
+      if (e.message === "IMAGE_COMPRESS_FAILED") {
+        return NextResponse.json(
+          { error: "Could not compress image under 200KB. Try a simpler image." },
           { status: 422 }
         );
       }

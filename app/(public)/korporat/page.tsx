@@ -187,9 +187,9 @@ export default async function CorporatePage() {
             </p>
           </div>
 
-          <div className="corporate-service-grid">
+          <div className="corporate-service-grid" role="list" aria-label="Daftar layanan korporat">
             {SERVICES.map((service) => (
-              <article key={service.title} className="k-card">
+              <article key={service.title} className="k-card" role="listitem">
                 <div className="k-icon" aria-hidden>{service.icon}</div>
                 <h3 className="k-title">{service.title}</h3>
                 <p className="k-body">{service.description}</p>
@@ -227,9 +227,9 @@ export default async function CorporatePage() {
             <span className="section-label">Siapa yang Kami Layani</span>
             <h2 className="section-title">Melayani Semua Jenis Organisasi</h2>
           </div>
-          <div className="corporate-industry-grid">
+          <div className="corporate-industry-grid" role="list" aria-label="Organisasi yang dilayani">
             {INDUSTRIES.map(([icon, name, description]) => (
-              <article key={name} className="corporate-industry-card">
+              <article key={name} className="corporate-industry-card" role="listitem">
                 <span aria-hidden>{icon}</span>
                 <h3>{name}</h3>
                 <p>{description}</p>
@@ -245,7 +245,7 @@ export default async function CorporatePage() {
             <span className="section-label">Cara Kerja</span>
             <h2 className="section-title">Proses Mudah, Transparan, Profesional</h2>
           </div>
-          <ol className="corporate-process">
+          <ol className="corporate-process" aria-label="Langkah proses korporat">
             {PROCESS.map(([number, icon, title, description]) => (
               <li key={number}>
                 <span className="corporate-process-number">{number}</span>
