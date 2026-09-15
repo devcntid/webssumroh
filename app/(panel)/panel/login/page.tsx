@@ -18,9 +18,18 @@ function LoginForm() {
   const errorMessage = useMemo(() => {
     const error = searchParams.get("error");
     if (!error) return null;
-    if (error === "AccessDenied") return "Anda harus terdaftar";
-    if (error === "OAuthAccountNotLinked") return "Anda harus terdaftar";
-    if (error === "Callback") return "Anda harus terdaftar";
+    if (error === "AccessDenied") {
+      return "Email Google Anda belum terdaftar sebagai admin, atau akun nonaktif.";
+    }
+    if (error === "OAuthAccountNotLinked") {
+      return "Email Google Anda belum terdaftar sebagai admin.";
+    }
+    if (error === "OAuthCallback" || error === "Callback" || error === "OAuthSignin") {
+      return "Gagal menyelesaikan login Google. Pastikan NEXTAUTH_URL dan redirect URI Google mengarah ke domain produksi, lalu coba lagi.";
+    }
+    if (error === "Configuration") {
+      return "Konfigurasi login belum lengkap. Periksa GOOGLE_CLIENT_ID / SECRET dan NEXTAUTH_SECRET.";
+    }
     return "Gagal masuk. Silakan coba lagi.";
   }, [searchParams]);
 

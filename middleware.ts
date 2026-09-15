@@ -1,11 +1,14 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 import { getToken } from "next-auth/jwt";
+import { ensureNextAuthUrl } from "@/lib/auth-url";
 
 /**
  * Auth guard for /panel — requires a valid NextAuth JWT unless bypass is on.
  */
 export async function middleware(req: NextRequest) {
+  ensureNextAuthUrl();
+
   if (process.env.ADMIN_AUTH_BYPASS === "true") {
     return NextResponse.next();
   }
@@ -25,7 +28,8 @@ export async function middleware(req: NextRequest) {
   if (!token?.userId) {
     const loginUrl = req.nextUrl.clone();
     loginUrl.pathname = "/panel/login";
-    loginUrl.searchParams.set("callbackUrl", pathname);
+    loginUrl.search = "";
+    loginUrl.searchParams.set("callbackUrl", pathname.startsWith("/panel") ? pathname : "/panel");
     return NextResponse.redirect(loginUrl);
   }
 
