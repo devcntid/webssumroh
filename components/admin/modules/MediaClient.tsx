@@ -12,6 +12,7 @@ import { Modal } from "@/components/admin/ui/Modal";
 import { ConfirmDialog } from "@/components/admin/ui/ConfirmDialog";
 import { Field } from "@/components/admin/ui/Field";
 import { useToast } from "@/components/admin/ui/Toast";
+import { uploadAdminFile } from "@/components/admin/lib/compress-image";
 import { fetchJson, issuesToFieldErrors } from "@/components/admin/lib/fetch-json";
 import type { MediaAsset } from "@/types/db";
 
@@ -98,31 +99,18 @@ export function MediaClient() {
   async function uploadFile(file: File) {
     setUploading(true);
     try {
-      const fd = new FormData();
-      fd.append("file", file);
-      fd.append("folder", "media-library");
-      const res = await fetch("/api/upload", { method: "POST", body: fd });
-      const json = await res.json().catch(() => ({}));
-      if (!res.ok) {
-        showToast((json as { error?: string }).error || `Upload failed (${res.status})`, "error");
-        return;
-      }
-      const data = (json as { data?: { url?: string; size?: number } }).data;
-      if (!data?.url) {
-        showToast("Upload failed: no file URL returned", "error");
-        return;
-      }
+      const data = await uploadAdminFile(file, "media-library");
       const baseName = file.name.replace(/\.[^.]+$/, "").replace(/[_-]+/g, " ");
       setForm((current) => ({
         ...current,
-        image_url: data.url!,
+        image_url: data.url,
         title: current.title.trim() || baseName.slice(0, 200),
         alt_text: current.alt_text.trim() || baseName.slice(0, 200),
         file_size_kb: data.size != null ? Math.max(1, Math.round(data.size / 1024)) : null,
       }));
       showToast("Image uploaded — save to add it to the library");
-    } catch {
-      showToast("Upload failed. Check your connection and try again.", "error");
+    } catch (error) {
+      showToast(error instanceof Error ? error.message : "Upload failed", "error");
     } finally {
       setUploading(false);
     }

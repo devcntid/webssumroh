@@ -3,6 +3,8 @@ import { requireAuth } from "@/lib/auth";
 import { asUploadableFile, uploadMedia } from "@/lib/blob";
 import { writeAuditLog } from "@/lib/queries/audit-logs";
 
+export const runtime = "nodejs";
+
 const CONTENT_ROLES = ["super_admin", "admin", "editor"] as const;
 
 export async function POST(req: NextRequest) {
@@ -12,8 +14,12 @@ export async function POST(req: NextRequest) {
   let form: FormData;
   try {
     form = await req.formData();
-  } catch {
-    return NextResponse.json({ error: "Expected multipart/form-data" }, { status: 422 });
+  } catch (error) {
+    console.error("[upload] formData parse failed", error);
+    return NextResponse.json(
+      { error: "Could not read upload. Keep images under 4MB and try again." },
+      { status: 422 }
+    );
   }
 
   const file = asUploadableFile(form.get("file"));
@@ -42,7 +48,6 @@ export async function POST(req: NextRequest) {
         },
       });
     } catch (auditError) {
-      // Upload must succeed even if audit logging fails.
       console.error("[upload] audit log failed", auditError);
     }
 
@@ -93,6 +98,12 @@ export async function POST(req: NextRequest) {
       }
     }
     console.error("[upload] unexpected error", e);
-    return NextResponse.json({ error: "Upload failed" }, { status: 500 });
+    return NextResponse.json(
+      {
+        error: "Upload failed",
+        detail: e instanceof Error ? e.message : "unknown",
+      },
+      { status: 500 }
+    );
   }
 }

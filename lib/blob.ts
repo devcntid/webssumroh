@@ -1,5 +1,6 @@
 import { put } from "@vercel/blob";
 import { compressImageToWebp } from "@/lib/image-compress";
+import { IMAGE_TARGET_MAX_BYTES } from "@/lib/upload-limits";
 
 const IMAGE_TYPES = new Set(["image/jpeg", "image/png", "image/webp", "image/gif"]);
 const VIDEO_TYPES = new Set(["video/mp4", "video/webm", "video/quicktime"]);
@@ -74,6 +75,12 @@ function isVideoFile(file: UploadableFile): boolean {
   return ext === "mp4" || ext === "webm" || ext === "mov";
 }
 
+function webpFilename(originalName: string): string {
+  const base =
+    originalName.replace(/\.[^.]+$/, "").replace(/[^a-zA-Z0-9._-]/g, "_") || "image";
+  return `${base}.webp`;
+}
+
 export async function uploadImage(
   file: UploadableFile,
   folder = "uploads"
@@ -86,18 +93,48 @@ export async function uploadImage(
     throw new Error("FILE_TOO_LARGE");
   }
 
-  let compressed;
+  const bytes = Buffer.from(await file.arrayBuffer());
+
+  // Client often already compressed to WebP ≤ 200KB — store directly (no sharp needed).
+  if (
+    (mime === "image/webp" || extensionOf(file.name) === "webp") &&
+    bytes.byteLength <= IMAGE_TARGET_MAX_BYTES
+  ) {
+    return putPublicBytes(bytes, folder, webpFilename(file.name), "image/webp");
+  }
+
   try {
-    compressed = await compressImageToWebp(await file.arrayBuffer(), file.name);
+    const compressed = await compressImageToWebp(bytes, file.name);
+    return putPublicBytes(
+      compressed.buffer,
+      folder,
+      compressed.filename,
+      compressed.contentType
+    );
   } catch (error) {
+    // Fallback: if already small enough, upload original bytes.
+    if (bytes.byteLength <= IMAGE_TARGET_MAX_BYTES) {
+      const contentType = mime === "image/png" ? "image/png" : mime === "image/gif" ? "image/gif" : mime === "image/webp" ? "image/webp" : "image/jpeg";
+      const ext =
+        contentType === "image/png"
+          ? "png"
+          : contentType === "image/gif"
+            ? "gif"
+            : contentType === "image/webp"
+              ? "webp"
+              : "jpg";
+      const base =
+        file.name.replace(/\.[^.]+$/, "").replace(/[^a-zA-Z0-9._-]/g, "_") || "image";
+      console.error("[upload] sharp compress failed, using original small file", error);
+      return putPublicBytes(bytes, folder, `${base}.${ext}`, contentType);
+    }
+
     if (error instanceof Error && error.message === "IMAGE_COMPRESS_FAILED") {
       throw error;
     }
     console.error("[upload] image compress failed", error);
     throw new Error("IMAGE_COMPRESS_FAILED");
   }
-
-  return putPublicBytes(compressed.buffer, folder, compressed.filename, compressed.contentType);
 }
 
 export async function uploadVideo(

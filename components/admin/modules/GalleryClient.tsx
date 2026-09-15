@@ -10,6 +10,7 @@ import { ConfirmDialog } from "@/components/admin/ui/ConfirmDialog";
 import { Field } from "@/components/admin/ui/Field";
 import { useToast } from "@/components/admin/ui/Toast";
 import { CTX_COL } from "@/components/admin/lib/colors";
+import { uploadAdminFile } from "@/components/admin/lib/compress-image";
 import { fetchJson, issuesToFieldErrors } from "@/components/admin/lib/fetch-json";
 import type { GalleryCategory, GalleryItem } from "@/types/db";
 
@@ -92,27 +93,19 @@ export function GalleryClient() {
 
   async function uploadFile(file: File) {
     setUploading(true);
-    const fd = new FormData();
-    fd.append("file", file);
-    fd.append("folder", "gallery");
-    const res = await fetch("/api/upload", { method: "POST", body: fd });
-    const json = await res.json().catch(() => ({}));
-    setUploading(false);
-    if (!res.ok) {
-      showToast((json as { error?: string }).error || "Upload failed", "error");
-      return;
+    try {
+      const data = await uploadAdminFile(file, "gallery");
+      setForm((p) => ({
+        ...p,
+        image_url: data.url,
+        alt_text: p.alt_text || file.name.replace(/\.[^.]+$/, ""),
+      }));
+      showToast("Image uploaded");
+    } catch (error) {
+      showToast(error instanceof Error ? error.message : "Upload failed", "error");
+    } finally {
+      setUploading(false);
     }
-    const url = (json as { data?: { url?: string } }).data?.url;
-    if (!url) {
-      showToast("Upload failed", "error");
-      return;
-    }
-    setForm((p) => ({
-      ...p,
-      image_url: url,
-      alt_text: p.alt_text || file.name.replace(/\.[^.]+$/, ""),
-    }));
-    showToast("Image uploaded");
   }
 
   async function save() {

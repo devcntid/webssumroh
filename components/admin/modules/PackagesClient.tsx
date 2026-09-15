@@ -11,6 +11,7 @@ import { Field } from "@/components/admin/ui/Field";
 import { useToast } from "@/components/admin/ui/Toast";
 import { SortableList } from "@/components/admin/dnd/SortableList";
 import { CAT_COL } from "@/components/admin/lib/colors";
+import { uploadAdminFile } from "@/components/admin/lib/compress-image";
 import { fetchJson, issuesToFieldErrors } from "@/components/admin/lib/fetch-json";
 import type { Package, PackageCategory, PriceMode } from "@/types/db";
 
@@ -134,18 +135,15 @@ export function PackagesClient() {
   async function uploadCover(file?: File) {
     if (!file) return;
     setUploading(true);
-    const body = new FormData();
-    body.append("file", file);
-    body.append("folder", "packages");
-    const response = await fetch("/api/upload", { method: "POST", body });
-    const json = await response.json().catch(() => ({}));
-    setUploading(false);
-    if (!response.ok || !json.data?.url) {
-      showToast(json.error || "Failed to upload package image", "error");
-      return;
+    try {
+      const data = await uploadAdminFile(file, "packages");
+      setForm((current) => ({ ...current, cover_image_url: data.url }));
+      showToast("Image uploaded. Save package to publish it.");
+    } catch (error) {
+      showToast(error instanceof Error ? error.message : "Failed to upload package image", "error");
+    } finally {
+      setUploading(false);
     }
-    setForm((current) => ({ ...current, cover_image_url: json.data.url as string }));
-    showToast("Image uploaded. Save package to publish it.");
   }
 
   async function save() {

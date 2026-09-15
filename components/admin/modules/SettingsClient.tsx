@@ -6,6 +6,7 @@ import { HexColorInput, HexColorPicker } from "react-colorful";
 import { Field } from "@/components/admin/ui/Field";
 import { Btn } from "@/components/admin/ui/Btn";
 import { useToast } from "@/components/admin/ui/Toast";
+import { uploadAdminFile } from "@/components/admin/lib/compress-image";
 import { fetchJson, issuesToFieldErrors } from "@/components/admin/lib/fetch-json";
 import { DEFAULT_LOGO_COLOR_URL, DEFAULT_LOGO_WHITE_URL } from "@/lib/brand";
 import {
@@ -153,57 +154,51 @@ export function SettingsClient() {
   async function uploadHomeSlideImage(index: number, file?: File) {
     if (!file) return;
     setUploadingSlideIndex(index);
-    const body = new FormData();
-    body.append("file", file);
-    body.append("folder", `heroes/home/slides`);
-    const response = await fetch("/api/upload", { method: "POST", body });
-    const json = await response.json().catch(() => ({}));
-    setUploadingSlideIndex(null);
-    if (!response.ok || !json.data?.url) {
-      showToast(json.error || "Failed to upload slide image", "error");
-      return;
+    try {
+      const data = await uploadAdminFile(file, "heroes/home/slides");
+      patchHomeSlide(index, { image_url: data.url });
+      showToast("Slide image uploaded. Save settings to publish it.");
+    } catch (error) {
+      showToast(error instanceof Error ? error.message : "Failed to upload slide image", "error");
+    } finally {
+      setUploadingSlideIndex(null);
     }
-    patchHomeSlide(index, { image_url: json.data.url as string });
-    showToast("Slide image uploaded. Save settings to publish it.");
   }
 
   async function uploadHero(page: HeroPageKey, file?: File) {
     if (!file) return;
     setUploadingPage(page);
-    const body = new FormData();
-    body.append("file", file);
-    body.append("folder", `heroes/${page}`);
-    const response = await fetch("/api/upload", { method: "POST", body });
-    const json = await response.json().catch(() => ({}));
-    setUploadingPage(null);
-    if (!response.ok || !json.data?.url) {
-      showToast(json.error || "Failed to upload hero image", "error");
-      return;
+    try {
+      const data = await uploadAdminFile(file, `heroes/${page}`);
+      setHero(page, { image_url: data.url });
+      showToast("Hero image uploaded. Save settings to publish it.");
+    } catch (error) {
+      showToast(error instanceof Error ? error.message : "Failed to upload hero image", "error");
+    } finally {
+      setUploadingPage(null);
     }
-    setHero(page, { image_url: json.data.url });
-    showToast("Hero image uploaded. Save settings to publish it.");
   }
 
   async function uploadLogo(variant: "color" | "white", file?: File) {
     if (!file) return;
     setUploadingLogo(variant);
-    const body = new FormData();
-    body.append("file", file);
-    body.append("folder", variant === "white" ? "brand/white" : "brand/color");
-    const response = await fetch("/api/upload", { method: "POST", body });
-    const json = await response.json().catch(() => ({}));
-    setUploadingLogo(null);
-    if (!response.ok || !json.data?.url) {
-      showToast(json.error || "Failed to upload logo", "error");
-      return;
+    try {
+      const data = await uploadAdminFile(
+        file,
+        variant === "white" ? "brand/white" : "brand/color"
+      );
+      const field = variant === "white" ? "logo_white_url" : "logo_url";
+      setForm((current) => ({ ...current, [field]: data.url }));
+      showToast(
+        variant === "white"
+          ? "White logo uploaded. Save settings to publish it."
+          : "Color logo uploaded. Save settings to publish it."
+      );
+    } catch (error) {
+      showToast(error instanceof Error ? error.message : "Failed to upload logo", "error");
+    } finally {
+      setUploadingLogo(null);
     }
-    const field = variant === "white" ? "logo_white_url" : "logo_url";
-    setForm((current) => ({ ...current, [field]: json.data.url as string }));
-    showToast(
-      variant === "white"
-        ? "White logo uploaded. Save settings to publish it."
-        : "Color logo uploaded. Save settings to publish it."
-    );
   }
 
   async function uploadHeroVideo(page: HeroPageKey, file?: File) {
