@@ -27,6 +27,25 @@ const nextConfig: NextConfig = {
       { source: "/halal-tour/:path*", destination: "/", permanent: true },
       { source: "/wisata-halal", destination: "/", permanent: true },
       { source: "/wisata-halal/:path*", destination: "/", permanent: true },
+      // Keep admin OAuth on the live custom domain (cookie + NEXTAUTH_URL must match).
+      {
+        source: "/panel",
+        has: [{ type: "host", value: "webssumroh.vercel.app" }],
+        destination: "https://ssumroh.id/panel",
+        permanent: false,
+      },
+      {
+        source: "/panel/:path*",
+        has: [{ type: "host", value: "webssumroh.vercel.app" }],
+        destination: "https://ssumroh.id/panel/:path*",
+        permanent: false,
+      },
+      {
+        source: "/api/auth/:path*",
+        has: [{ type: "host", value: "webssumroh.vercel.app" }],
+        destination: "https://ssumroh.id/api/auth/:path*",
+        permanent: false,
+      },
     ];
   },
   serverExternalPackages: ["@neondatabase/serverless", "sharp"],

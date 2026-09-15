@@ -25,7 +25,7 @@ function LoginForm() {
       return "Email Google Anda belum terdaftar sebagai admin.";
     }
     if (error === "OAuthCallback" || error === "Callback" || error === "OAuthSignin") {
-      return "Gagal menyelesaikan login Google. Pastikan NEXTAUTH_URL dan redirect URI Google mengarah ke domain produksi, lalu coba lagi.";
+      return "Gagal menyelesaikan login Google. Gunakan https://ssumroh.id/panel/login dan pastikan NEXTAUTH_URL + Google redirect URI memakai domain ssumroh.id.";
     }
     if (error === "Configuration") {
       return "Konfigurasi login belum lengkap. Periksa GOOGLE_CLIENT_ID / SECRET dan NEXTAUTH_SECRET.";
