@@ -59,45 +59,30 @@ function LoginForm() {
           </div>
         </div>
 
-        <p style={{ margin: "0 0 20px", fontSize: 14, color: "#5c5668", lineHeight: 1.5 }}>
+        <p className="admin-login-intro">
           Masuk dengan akun Google yang sudah terdaftar di sistem.
           Tidak ada registrasi mandiri.
         </p>
 
         {errorMessage && (
-          <div
-            role="alert"
-            style={{
-              marginBottom: 16,
-              padding: "12px 14px",
-              borderRadius: 10,
-              background: "#FEE2E2",
-              border: "1px solid #FCA5A5",
-              color: "#991B1B",
-              fontSize: 13,
-              fontWeight: 500,
-            }}
-          >
+          <div role="alert" className="admin-login-alert">
             {errorMessage}
           </div>
         )}
 
         <button
           type="button"
-          className="admin-btn primary"
+          className="admin-login-google"
           onClick={handleGoogleSignIn}
           disabled={loading || status === "loading" || status === "authenticated"}
-          style={{
-            width: "100%",
-            justifyContent: "center",
-            gap: 10,
-            padding: "12px 16px",
-            fontSize: 14,
-          }}
         >
           <GoogleIcon />
           {loading ? "Mengalihkan…" : "Masuk dengan Google"}
         </button>
+
+        <p className="admin-login-hint">
+          Gunakan email admin yang sudah ditambahkan di User management.
+        </p>
       </div>
     </div>
   );
@@ -105,7 +90,7 @@ function LoginForm() {
 
 function GoogleIcon() {
   return (
-    <svg width="18" height="18" viewBox="0 0 48 48" aria-hidden="true">
+    <svg className="admin-login-google-icon" width="20" height="20" viewBox="0 0 48 48" aria-hidden="true">
       <path
         fill="#FFC107"
         d="M43.6 20.5H42V20H24v8h11.3C33.7 32.9 29.3 36 24 36c-6.6 0-12-5.4-12-12s5.4-12 12-12c3 0 5.8 1.2 7.9 3.1l5.7-5.7C34 5.1 29.3 3 24 3 12.3 3 3 12.3 3 24s9.3 21 21 21 21-9.3 21-21c0-1.4-.1-2.3-.4-3.5z"
