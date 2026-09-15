@@ -13,69 +13,151 @@ export interface UploadResult {
   size: number;
 }
 
+export interface UploadableFile {
+  name: string;
+  type: string;
+  size: number;
+  arrayBuffer: () => Promise<ArrayBuffer>;
+}
+
+/** Accept File/Blob from multipart even when `instanceof File` fails across realms. */
+export function asUploadableFile(value: unknown): UploadableFile | null {
+  if (!value || typeof value !== "object") return null;
+  const candidate = value as {
+    arrayBuffer?: () => Promise<ArrayBuffer>;
+    size?: number;
+    name?: string;
+    type?: string;
+  };
+  if (typeof candidate.arrayBuffer !== "function") return null;
+  if (typeof candidate.size !== "number") return null;
+
+  const name =
+    typeof candidate.name === "string" && candidate.name.trim()
+      ? candidate.name
+      : "upload.bin";
+  const type = typeof candidate.type === "string" ? candidate.type : "";
+
+  return {
+    name,
+    type,
+    size: candidate.size,
+    arrayBuffer: () => candidate.arrayBuffer!(),
+  };
+}
+
+function extensionOf(name: string): string {
+  const parts = name.toLowerCase().split(".");
+  return parts.length > 1 ? parts[parts.length - 1] : "";
+}
+
+function resolveImageMime(file: UploadableFile): string | null {
+  if (IMAGE_TYPES.has(file.type)) return file.type;
+  switch (extensionOf(file.name)) {
+    case "jpg":
+    case "jpeg":
+      return "image/jpeg";
+    case "png":
+      return "image/png";
+    case "webp":
+      return "image/webp";
+    case "gif":
+      return "image/gif";
+    default:
+      return null;
+  }
+}
+
+function isVideoFile(file: UploadableFile): boolean {
+  if (VIDEO_TYPES.has(file.type)) return true;
+  const ext = extensionOf(file.name);
+  return ext === "mp4" || ext === "webm" || ext === "mov";
+}
+
 export async function uploadImage(
-  file: File,
+  file: UploadableFile,
   folder = "uploads"
 ): Promise<UploadResult> {
-  if (!IMAGE_TYPES.has(file.type)) {
+  const mime = resolveImageMime(file);
+  if (!mime) {
     throw new Error("UNSUPPORTED_FILE_TYPE");
   }
   if (file.size > IMAGE_MAX_BYTES) {
     throw new Error("FILE_TOO_LARGE");
   }
 
-  const compressed = await compressImageToWebp(await file.arrayBuffer(), file.name);
-  const webpFile = new File([new Uint8Array(compressed.buffer)], compressed.filename, {
-    type: compressed.contentType,
-  });
+  let compressed;
+  try {
+    compressed = await compressImageToWebp(await file.arrayBuffer(), file.name);
+  } catch (error) {
+    if (error instanceof Error && error.message === "IMAGE_COMPRESS_FAILED") {
+      throw error;
+    }
+    console.error("[upload] image compress failed", error);
+    throw new Error("IMAGE_COMPRESS_FAILED");
+  }
 
-  return putPublicFile(webpFile, folder, compressed.contentType);
+  return putPublicBytes(compressed.buffer, folder, compressed.filename, compressed.contentType);
 }
 
 export async function uploadVideo(
-  file: File,
+  file: UploadableFile,
   folder = "uploads/videos"
 ): Promise<UploadResult> {
-  if (!VIDEO_TYPES.has(file.type)) {
+  if (!isVideoFile(file)) {
     throw new Error("UNSUPPORTED_VIDEO_TYPE");
   }
   if (file.size > VIDEO_MAX_BYTES) {
     throw new Error("VIDEO_TOO_LARGE");
   }
-  return putPublicFile(file, folder);
+
+  const bytes = Buffer.from(await file.arrayBuffer());
+  const contentType = VIDEO_TYPES.has(file.type) ? file.type : "video/mp4";
+  return putPublicBytes(bytes, folder, file.name, contentType);
 }
 
-/** Upload image or video based on MIME type. Images are always compressed to WebP ≤ 200KB. */
+/** Upload image or video based on MIME/extension. Images are compressed to WebP ≤ 200KB. */
 export async function uploadMedia(
-  file: File,
+  file: UploadableFile,
   folder = "uploads"
 ): Promise<UploadResult> {
-  if (IMAGE_TYPES.has(file.type)) {
-    return uploadImage(file, folder);
-  }
-  if (VIDEO_TYPES.has(file.type)) {
+  if (isVideoFile(file)) {
     return uploadVideo(file, folder);
+  }
+  if (resolveImageMime(file)) {
+    return uploadImage(file, folder);
   }
   throw new Error("UNSUPPORTED_FILE_TYPE");
 }
 
-async function putPublicFile(
-  file: File,
+async function putPublicBytes(
+  body: Buffer,
   folder: string,
-  contentType = file.type
+  filename: string,
+  contentType: string
 ): Promise<UploadResult> {
-  const safeName = file.name.replace(/[^a-zA-Z0-9._-]/g, "_");
-  const pathname = `${folder}/${Date.now()}-${safeName}`;
+  if (!process.env.BLOB_READ_WRITE_TOKEN) {
+    throw new Error("BLOB_NOT_CONFIGURED");
+  }
 
-  const blob = await put(pathname, file, {
-    access: "public",
-    contentType,
-  });
+  const safeName = filename.replace(/[^a-zA-Z0-9._-]/g, "_") || "upload.bin";
+  const pathname = `${folder.replace(/\/+$/, "")}/${Date.now()}-${safeName}`;
 
-  return {
-    url: blob.url,
-    pathname: blob.pathname,
-    contentType,
-    size: file.size,
-  };
+  try {
+    const blob = await put(pathname, body, {
+      access: "public",
+      contentType,
+      token: process.env.BLOB_READ_WRITE_TOKEN,
+    });
+
+    return {
+      url: blob.url,
+      pathname: blob.pathname,
+      contentType,
+      size: body.byteLength,
+    };
+  } catch (error) {
+    console.error("[upload] blob put failed", error);
+    throw new Error("BLOB_UPLOAD_FAILED");
+  }
 }
